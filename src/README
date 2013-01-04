@@ -1,0 +1,3 @@
+qmake-qt4 -set QMAKEFEATURES /usr/share/qt4/mkspecs/features
+qmake-qt4 qpicoscope.pro
+make
