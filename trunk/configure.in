@@ -1,6 +1,6 @@
-AC_INIT(QPicoscope,0.1)
-AC_CONFIG_HEADERS(my-project-config.h)
-AM_INIT_AUTOMAKE
+AC_INIT([QPicoscope],[0.1],[vincent.hervieux@free.fr])
+AC_CONFIG_HEADERS(qpicoscope-config.h)
+AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 AC_PROG_CC
 AC_PROG_CXX
 
@@ -10,14 +10,17 @@ AC_ARG_WITH([qt-dir],
              AC_HELP_STRING([--with-qt-dir=/path/to/Qt-4.1.0],
                             [to specify the path to the Qt-4.1.0 directory.]),
              [QTPATHS="$withval"],
-             [QTPATHS="/usr/local/Trolltech/Qt-4.1.0 /c/Qt/4.1.0"])
+             [QTPATHS="/usr/local/Trolltech/Qt-4.1.0 /c/Qt/4.1.0"],
+             [QTPATHS="/usr/share/qt4"])
 
 for x in $QTPATHS; do
+    echo "trying $x" >> /tmp/install.log;
     if test -d $x ; then
        QTDIR="$x"
     fi
 done
 if test $QTDIR = xxx ; then
+   echo "echo works" >> /tmp/install.log;
    AC_MSG_ERROR(Could not locate QT 4.1)
 fi
 AC_MSG_RESULT($QTDIR)
@@ -107,5 +110,5 @@ fi
 AC_MSG_RESULT(yes)
 rm -f moc_myqt.cpp myqt.h myqt.cpp myqt.o myqt moc_myqt.o
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
