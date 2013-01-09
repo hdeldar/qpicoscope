@@ -1,3 +1,5 @@
-include $(top_srcdir)/build-aux/autotroll.mk
+ACLOCAL_AMFLAGS = -I build-aux
 
 SUBDIRS = src
+
+EXTRA_DIST = bootstrap

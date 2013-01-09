@@ -1,31 +1,15 @@
-# The final program is called "myapp"
+include $(top_srcdir)/build-aux/autotroll.mk
+
+# For a program:
 bin_PROGRAMS = QPicoscope
+QPicoscope_SOURCES = acquisition2000.cpp  acquisition3000.cpp  acquisition.cpp  comborange.cpp  frontpanel.cpp  main.cpp  mainwindow.cpp  screen.cpp \
+                      drawdata.h  frontpanel.h  mainwindow.h  oscilloscope.h  screen.h \
+                      drawdata.moc.cpp frontpanel.moc.cpp mainwindow.moc.cpp oscilloscope.moc.cpp screen.moc.cpp
 
-# You have two .cpp files you wrote, myapp.cpp and another.cpp
-# Remember to include the name of the resource file with the .cpp extension.
-QPicoscope_SOURCES = \
-	acquisition2000.cpp  acquisition3000.cpp  acquisition.cpp  comborange.cpp  frontpanel.cpp  main.cpp  mainwindow.cpp  screen.cpp \
-    resources.cpp
+QPicoscope_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS)
+QPicoscope_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS)
+QPicoscope_LDFLAGS  = $(QT_LDFLAGS) $(LDFLAGS)
+QPicoscope_LDADD    = $(QT_LIBS) $(LDADD)
 
-# You have one .h file, it's called myapp.h. Therefore, here I list
-# its mocced name, moc_myapp.cpp.
-nodist_QPicoscope_SOURCES = \
-	moc_acquisition2000.cpp  moc_acquisition3000.cpp  moc_acquisition.cpp  moc_comborange.cpp  drawdata.h  frontpanel.h  mainwindow.h  oscilloscope.h  screen.h
+BUILT_SOURCES = drawdata.moc.cpp frontpanel.moc.cpp mainwindow.moc.cpp oscilloscope.moc.cpp screen.moc.cpp
 
-# This is to ensure the myapp.h file is distributed in your myapp-0.1.tar.gz
-# I also have a resources.qrc I need to include. The png is used in myapp.
-EXTRA_DIST = \
-	$(nodist_QPicoscope_SOURCES:moc_%.cpp=%.h) \
-	resources.qrc myapp.png
-
-# This rule lets GNU make create any moc_*.cpp from the equivalent *.h
-moc_%.cpp: %.h
-	moc $< -o $@
-
-# Adjust this line according to your resources.qrc
-resources.cpp : resources.qrc octave-gui.png
-	rcc resources.qrc -o resources.cpp
-
-# This line ensures that generated moc_*.cpp and resources.cpp files are
-# deleted when we make clean.
-CLEANFILES = $(filter moc_%.cpp,$(QPicoscope_SOURCES)) resources.cpp
