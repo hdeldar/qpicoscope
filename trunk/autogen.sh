@@ -1,6 +1,6 @@
 #! /bin/sh
 
-aclocal \
+aclocal -I build-aux\
 && autoheader \
 && automake --add-missing \
-&& autoconf
+&& autoconf -I build-aux
