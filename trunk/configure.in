@@ -1,4 +1,7 @@
 AC_INIT([QPicoscope],[0.1],[vincent.hervieux@free.fr])
+# autotroll:
+AC_CONFIG_AUX_DIR([build-aux])
+# set all warnings ON:
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 # Check for programs
 AC_PROG_CC
