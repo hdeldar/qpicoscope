@@ -5,6 +5,8 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 # Check for programs
 AC_PROG_CC
+# Look for a C++ compiler.
+AC_LANG([C++])
 AC_PROG_CXX
 AC_CHECK_PROGS([QMAKE], [qmake-qt4 qmake], [:])
 if test "$QMAKE" = :; then
@@ -16,7 +18,11 @@ AC_CHECK_LIB([ps2000], [ps2000_open_unit],,AC_MSG_ERROR([This package needs libp
 AC_CHECK_LIB([ps3000], [ps3000_open_unit],,AC_MSG_ERROR([This package needs libps3000 from Picotech.]))
 AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
 
+# AutoTroll with Qt.
+AT_WITH_QT
+
 # Output files
 AC_CONFIG_HEADERS(qpicoscope-config.h)
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+                 src/Makefile])
 AC_OUTPUT
