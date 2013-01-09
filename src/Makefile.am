@@ -4,14 +4,13 @@ bin_PROGRAMS = QPicoscope
 # You have two .cpp files you wrote, myapp.cpp and another.cpp
 # Remember to include the name of the resource file with the .cpp extension.
 QPicoscope_SOURCES = \
-	myapp.cpp \
-	another.cpp \
+	acquisition2000.cpp  acquisition3000.cpp  acquisition.cpp  comborange.cpp  frontpanel.cpp  main.cpp  mainwindow.cpp  screen.cpp \
     resources.cpp
 
 # You have one .h file, it's called myapp.h. Therefore, here I list
 # its mocced name, moc_myapp.cpp.
 nodist_QPicoscope_SOURCES = \
-	moc_myapp.cpp
+	moc_acquisition2000.cpp  moc_acquisition3000.cpp  moc_acquisition.cpp  moc_comborange.cpp  drawdata.h  frontpanel.h  mainwindow.h  oscilloscope.h  screen.h
 
 # This is to ensure the myapp.h file is distributed in your myapp-0.1.tar.gz
 # I also have a resources.qrc I need to include. The png is used in myapp.
