@@ -1,6 +1,8 @@
 AC_INIT([QPicoscope],[0.1],[vincent.hervieux@free.fr])
-# autotroll:
+# place to put some extra build scripts installed
 AC_CONFIG_AUX_DIR([build-aux])
+# local m4 scripts
+AC_CONFIG_MACRO_DIR([build-aux])
 # set all warnings ON:
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
 # Check for programs
@@ -21,10 +23,29 @@ AC_CHECK_LIB([ps3000], [ps3000_open_unit],,AC_MSG_ERROR([This package needs libp
 AC_CHECK_LIB([qwt-qt4], [_init],,AC_MSG_ERROR([This package needs libqwt-qt4]))
 AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
 
-
 # AutoTroll with Qt.
 AT_WITH_QT
-AT_WITH_QT([+qwt-qt4]) 
+
+qt_ok=yes
+AC_PATH_PROGS([QMAKE], 
+        [qmake-qt4 qmake-4.4 qmake-mac qmake],
+        [not-found])
+
+    if test "x$QMAKE" = "xnot-found" ; then
+        AC_MSG_WARN([could not find qmake for QT4 ])
+        qt_ok=no
+    else
+        AC_SUBST([QMAKE], [$ac_cv_path_QMAKE])
+        AC_FIND_QWT(5.0.0,4,
+            [qwt-qt4 qwt], 
+            [/usr/include/qwt5 /usr/include/qwt-qt4 /opt/local/include /opt/local/include/qwt /usr/include/qwt],
+            [/opt/local/lib],
+            [qt_ok=no])
+    fi
+
+    if test "x$qt_ok" = "xno"; then
+        AC_MSG_ERROR([QT or QWT could not be found. See previous errors.])
+    fi
 
 # Output files
 AC_CONFIG_HEADERS(qpicoscope-config.h)
