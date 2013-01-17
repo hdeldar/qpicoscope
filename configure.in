@@ -17,9 +17,17 @@ fi
 #check for headers
 AC_CHECK_HEADERS([pthread.h])
 
-# Check for libraries -lm -lps2000 -lps3000 -lqwt-qt4 -lQtGui -lQtCore -lpthread 
-AC_CHECK_LIB([ps2000], [ps2000_open_unit],,AC_MSG_ERROR([This package needs libps2000 from Picotech. It can be found either in lib directory or on Picotech website.]))
-AC_CHECK_LIB([ps3000], [ps3000_open_unit],,AC_MSG_ERROR([This package needs libps3000 from Picotech. It can be found either in lib directory or on Picotech website.]))
+# Check for libraries -lm -lps2000 -lps3000 -lqwt-qt4 -lQtGui -lQtCore -lpthread
+libps2000_ok=yes
+libps3000_ok=yes 
+AC_CHECK_LIB([ps2000], [ps2000_open_unit],,[libps2000_ok=no])
+AC_CHECK_LIB([ps3000], [ps3000_open_unit],,[libps3000_ok=no])
+if test "x$libps2000_ok" = "xno"; then
+    if test "x$libps3000_ok" = "xno"; then
+        AC_MSG_ERROR([Need at least one of the following: libps2000 or libps3000 from Picotech.\
+It can be found either in lib directory or on Picotech's website.])
+    fi
+fi
 #AC_CHECK_LIB([qwt-qt4], [_init],,AC_MSG_ERROR([This package needs libqwt-qt4]))
 #AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
 
