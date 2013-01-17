@@ -28,6 +28,8 @@
 
 #include "acquisition2000.h"
 
+#ifdef HAVE_LIBPS2000
+
 #ifndef WIN32
 #define Sleep(x) usleep(1000*(x))
 enum BOOL {FALSE,TRUE};
@@ -1477,3 +1479,4 @@ short Acquisition2000::mv_to_adc (short mv, short ch)
   return ( ( mv * 32767 ) / input_ranges[ch] );
 }
 
+#endif // HAVE_LIBPS2000
