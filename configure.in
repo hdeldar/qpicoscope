@@ -18,10 +18,10 @@ fi
 AC_CHECK_HEADERS([pthread.h])
 
 # Check for libraries -lm -lps2000 -lps3000 -lqwt-qt4 -lQtGui -lQtCore -lpthread 
-AC_CHECK_LIB([ps2000], [ps2000_open_unit],,AC_MSG_ERROR([This package needs libps2000 from Picotech.]))
-AC_CHECK_LIB([ps3000], [ps3000_open_unit],,AC_MSG_ERROR([This package needs libps3000 from Picotech.]))
-AC_CHECK_LIB([qwt-qt4], [_init],,AC_MSG_ERROR([This package needs libqwt-qt4]))
-AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
+AC_CHECK_LIB([ps2000], [ps2000_open_unit],,AC_MSG_ERROR([This package needs libps2000 from Picotech. It can be found either in lib directory or on Picotech website.]))
+AC_CHECK_LIB([ps3000], [ps3000_open_unit],,AC_MSG_ERROR([This package needs libps3000 from Picotech. It can be found either in lib directory or on Picotech website.]))
+#AC_CHECK_LIB([qwt-qt4], [_init],,AC_MSG_ERROR([This package needs libqwt-qt4]))
+#AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
 
 # AutoTroll with Qt.
 AT_WITH_QT

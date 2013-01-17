@@ -53,6 +53,10 @@ public:
      */
     ComboRange(const QString &text, QWidget *parent = 0);
     /**
+     * @brief destructor
+     */
+    virtual ~ComboRange();
+    /**
      * @brief get current ComboRange's value
      * @return ComboBox's current index
      */

@@ -44,6 +44,12 @@ ComboRange::ComboRange(const QString &text, QWidget *parent)
     setText(text);
 }
 
+ComboRange::~ComboRange()
+{
+  delete label;
+  delete combo;
+}
+
 void ComboRange::init()
 {
     combo = new QComboBox();
