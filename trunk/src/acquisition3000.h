@@ -28,6 +28,10 @@
 #ifndef ACQUISITION3000_H
 #define ACQUISITION3000_H
 
+#include "../qpicoscope-config.h" 
+
+#ifdef HAVE_LIBPS3000
+
 #include <string>
 #include <vector>
 
@@ -228,4 +232,5 @@ private:
     static const short input_ranges [PS3000_MAX_RANGES] /*= {10, 20, 50, 100, 200, 500, 1000, 3000, 5000, 10000, 30000, 50000}*/;
 };
 
+#endif // HAVE_LIBPS3000
 #endif // ACQUISITION3000_H

@@ -28,6 +28,10 @@
 #ifndef ACQUISITION2000_H
 #define ACQUISITION2000_H
 
+#include "../qpicoscope-config.h"
+
+#ifdef HAVE_LIBPS2000
+
 #include <string>
 #include <vector>
 
@@ -224,4 +228,5 @@ private:
     static const short input_ranges [PS2000_MAX_RANGES] /*= {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000}*/;
 };
 
+#endif // HAVE_LIBPS2000
 #endif // ACQUISITION2000_H

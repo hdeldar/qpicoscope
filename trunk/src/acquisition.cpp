@@ -61,8 +61,12 @@ Acquisition* Acquisition::get_instance()
     {
         // TODO Need to choose in a dynamic way between 2000 and 3000 series here..
         WARNING( "Need to choose in a dynamic way between 2000 and 3000 series here...\n");
+#ifdef HAVE_LIBPS2000
         //Acquisition::singleton_m = Acquisition2000::get_instance();
+#endif
+#ifdef HAVE_LIBPS3000
         Acquisition::singleton_m = Acquisition3000::get_instance();
+#endif
     }
 
     return Acquisition::singleton_m;
