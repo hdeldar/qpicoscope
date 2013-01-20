@@ -48,6 +48,7 @@ const char * Acquisition::unknown_adc_units = "Not Known";
 Acquisition::Acquisition()
 {
     DEBUG( "Acquisition model construction...\n");
+    thread_id = 0;
 }
 
 /****************************************************************************
@@ -57,16 +58,43 @@ Acquisition::Acquisition()
  ****************************************************************************/
 Acquisition* Acquisition::get_instance()
 {
+    device_info_t info;
     if(NULL == Acquisition::singleton_m)
     {
         // TODO Need to choose in a dynamic way between 2000 and 3000 series here..
-        WARNING( "Need to choose in a dynamic way between 2000 and 3000 series here...\n");
+        do
+        {
 #ifdef HAVE_LIBPS2000
-        //Acquisition::singleton_m = Acquisition2000::get_instance();
+            Acquisition::singleton_m = Acquisition2000::get_instance();
+            memset(&info, 0, sizeof(device_info_t));
+            Acquisition::singleton_m->get_device_info(&info);
+            if(0 == strncmp( info.device_name, "No device or device not supported", DEVICE_NAME_MAX))
+            {
+                DEBUG("No Picoscope 2000 series found.\n");
+                delete((Acquisition2000*)Acquisition::singleton_m);
+                Acquisition::singleton_m = NULL;
+            }
+            else
+            {
+                break;
+            }
 #endif
 #ifdef HAVE_LIBPS3000
-        Acquisition::singleton_m = Acquisition3000::get_instance();
+            Acquisition::singleton_m = Acquisition3000::get_instance();
+            memset(&info, 0, sizeof(device_info_t));
+            Acquisition::singleton_m->get_device_info(&info);
+            if(0 == strncmp( info.device_name, "No device or device not supported", DEVICE_NAME_MAX))
+            {
+                DEBUG("No Picoscope 3000 series found.\n");
+                delete((Acquisition3000*)Acquisition::singleton_m);
+                Acquisition::singleton_m = NULL;
+            }
+            else
+            {
+                break;
+            }
 #endif
+        }while(0);
     }
 
     return Acquisition::singleton_m;
@@ -79,6 +107,8 @@ Acquisition* Acquisition::get_instance()
  ****************************************************************************/
 Acquisition::~Acquisition()
 {
+    if( thread_id )
+        stop();
 }
 
 /****************************************************************************
@@ -135,9 +165,10 @@ void Acquisition::start(void)
     int ret = 0;
     sem_init(&thread_stop, 0, 0);
     ret = pthread_create(&thread_id, NULL, Acquisition::threadAcquisition, NULL);
-    if( 0 != thread_id)
+    if( 0 != ret )
     {
         ERROR("pthread_create failed and returned %d\n", ret);
+        thread_id = 0;
     }
 }
 /****************************************************************************
@@ -147,6 +178,7 @@ void Acquisition::stop(void)
 {
     sem_post(&thread_stop);
     pthread_join(thread_id, NULL);
+    thread_id = 0;
 }
 
 /****************************************************************************

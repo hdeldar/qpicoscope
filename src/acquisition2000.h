@@ -57,8 +57,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdint.h>
-#include <pthread.h>
-#include <semaphore.h>
 
 /* Definition of PS2000 driver routines on Linux */
 //#define DYNLINK

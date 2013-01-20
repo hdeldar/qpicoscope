@@ -49,6 +49,7 @@ public:
 private slots:
     void about();
     void aboutQt();
+    void credits();
 
 private:
     void createActions();
@@ -60,6 +61,7 @@ private:
     QAction *exitAct_m;
     QAction *aboutAct_m;
     QAction *aboutQtAct_m;
+    QAction *creditsAct_m;
 };
 
 #endif

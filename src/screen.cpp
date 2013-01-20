@@ -47,6 +47,11 @@ Screen::Screen(QWidget *parent)
 
     initGradient();
 
+    currentVoltCaliber = 0.;
+    currentTimeCaliber = 0.;
+    currentTrigger = E_TRIGGER_AUTO;
+    currentCurrent = E_CURRENT_AC;
+
     setPalette(QPalette(QColor(250, 250, 200)));
     setAutoFillBackground(true);
     setAxisTitle(QwtPlot::xBottom, "Time [s]");
