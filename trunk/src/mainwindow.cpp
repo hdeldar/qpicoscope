@@ -70,6 +70,19 @@ void MainWindow::aboutQt()
 {
 }
 
+void MainWindow::credits()
+{
+    QMessageBox msgBox(this);
+    QDesktopWidget win;
+    msgBox.setWindowTitle("Credits");
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText(tr(CREDITS_QPICOSCOPE));
+    msgBox.show();
+    msgBox.move( win.width() / 2 - msgBox.width() / 2, win.height() / 2 - msgBox.height() / 2 );
+    msgBox.exec();
+}
+
 void MainWindow::createMenus()
  {
      fileMenu_m = menuBar()->addMenu(tr("&File"));
@@ -78,6 +91,7 @@ void MainWindow::createMenus()
      helpMenu_m = menuBar()->addMenu(tr("&Help"));
      helpMenu_m->addAction(aboutAct_m);
      helpMenu_m->addAction(aboutQtAct_m);
+     helpMenu_m->addAction(creditsAct_m);
 
  }
 
@@ -96,4 +110,8 @@ void MainWindow::createActions()
      aboutQtAct_m->setStatusTip(tr("Show the Qt library's About box"));
      connect(aboutQtAct_m, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
      connect(aboutQtAct_m, SIGNAL(triggered()), this, SLOT(aboutQt()));
+     
+     creditsAct_m = new QAction(tr("&Credits"), this);
+     creditsAct_m->setStatusTip(tr("Show the application's credits box"));
+     connect(creditsAct_m, SIGNAL(triggered()), this, SLOT(credits()));
 }

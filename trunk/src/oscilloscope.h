@@ -33,11 +33,13 @@
 #include <limits.h>
 
 /*!!! TODO remove this flag while testing with HW!!!*/
-#define TEST_WITHOUT_HW
+//#define TEST_WITHOUT_HW
 
-#define ABOUT_QPICOSCOPE     "<p align='center'>Copyright 2012 Vincent HERVIEUX <br>"\
+#define ABOUT_QPICOSCOPE     "<p align='center'>Copyright 2012 Vincent HERVIEUX<br>"\
                              "<a href='mailto:vincent.hervieux@free.fr?Subject=QPicoscope'>vincent.hervieux@free.fr</a></p>"\
-                             "<p align='justify'><br>Qpicoscope is a Qt frontend for Picoscope 2000 series from <a href='http://www.picotech.com'>Pico Tech</a>.<br>"\
+                             "<p align='justify'><br>"\
+                             "Qpicoscope is a Qt frontend for Picoscope 2000-3000 series<br>"\
+                             "from <a href='http://www.picotech.com'>Pico Tech</a>.<br>"\
                              "<br>"\
                              "QPicoscope is free software: you can redistribute it and/or modify<br>"\
                              "it under the terms of the GNU Lesser General Public License as published by<br>"\
@@ -53,6 +55,12 @@
                              "along with QPicoscope in files COPYING.LESSER and COPYING.<br>"\
                              "If not, see <a href='http://www.gnu.org/licenses'>http://www.gnu.org/licenses</a>.<br></p>"
 
+
+#define CREDITS_QPICOSCOPE   "<p align='justify'>QPicoscope si using:<br>"\
+                             "- Qt. Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).<br>"\
+                             "  Qt is a Nokia product. See qt.nokia.com for more information.<br>"\
+                             "- Qwt. Copyright (C) 1997 Josef Wilgen; Copyright (C) 2002 Uwe Rathmann.<br>"\
+                             "- AutoTroll. Copyright (C) 2006  Benoit Sigoure <benoit.sigoure@lrde.epita.fr.</p>"
 typedef enum
 {
     E_CURRENT_AC = 0,

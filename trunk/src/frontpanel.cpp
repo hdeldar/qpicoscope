@@ -54,13 +54,36 @@ FrontPanel::FrontPanel(QWidget *parent)
     QVBoxLayout *screenLayout = new QVBoxLayout;
     QGridLayout *gridLayout = new QGridLayout;
 
-    // create the oscilloscope screen
+    /* initialize ComboRanges */
+    volt_channel_A = NULL;
+    volt_channel_B = NULL;
+    current = NULL;
+    time = NULL;
+    trigger = NULL;
+
+    /* initialize items */
+    volt_items = NULL;
+    current_items = NULL;
+    time_items = NULL;
+    trigger_items = NULL;
+
+    /* create the oscilloscope screen */
     screen = new Screen();
 
     // mod the front panel depending on the picoscope capabilities
+    memset(&device_info, 0, sizeof(Acquisition::device_info_t));
     acquisition = Acquisition::get_instance();
-    acquisition->setDrawData(screen);
-    acquisition->get_device_info(&device_info);
+    if(NULL == acquisition)
+    {
+        ERROR("Acquisition::get_instance returned NULL.\n");
+        snprintf(device_info.device_name, DEVICE_NAME_MAX ,"No detected device...!");
+        
+    }
+    else
+    {
+        acquisition->setDrawData(screen);
+        acquisition->get_device_info(&device_info);
+    }
     // show the detected device name in status bar for 30 seconds
     ((QMainWindow*)parent)->statusBar()->showMessage(tr(device_info.device_name), 30000);
     // Create our combo boxes with label:
@@ -143,20 +166,34 @@ FrontPanel::FrontPanel(QWidget *parent)
 FrontPanel::~FrontPanel()
 {
     /* delete ComboRanges */
-    delete volt_channel_A;
-    delete volt_channel_B;
-    delete current;
-    delete time;
-    delete trigger;
+    if( NULL != volt_channel_A )
+        delete volt_channel_A;
+    if( NULL != volt_channel_B )
+        delete volt_channel_B;
+    if( NULL != current )
+        delete current;
+    if( NULL != time )
+        delete time;
+    if( NULL != trigger )
+        delete trigger;
 
     /* delete items */
-    delete volt_items;
-    delete current_items;
-    delete time_items;
-    delete trigger_items;
+    if( NULL != volt_items )
+        delete volt_items;
+    if( NULL != current_items )
+        delete current_items;
+    if( NULL != time_items )
+        delete time_items;
+    if( NULL != trigger_items )
+        delete trigger_items;
 
     /* delete acquisition */
-    delete acquisition;
+    if(NULL != acquisition)
+    {
+        acquisition->stop();
+        delete acquisition;
+        acquisition = NULL;
+    }
 }
 
 void FrontPanel::create_menu_items()
@@ -318,26 +355,35 @@ void FrontPanel::create_menu_items()
 void FrontPanel::setVoltChannelAChanged(int comboIndex)
 {
     screen->setVoltCaliber((volt_items->at(comboIndex)).value);
-    acquisition->stop();
-    acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->at(comboIndex)).value);
-    acquisition->start();
+    if( NULL != acquisition )
+    {
+        acquisition->stop();
+        acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->at(comboIndex)).value);
+        acquisition->start();
+    }
 }
 
 void FrontPanel::setVoltChannelBChanged(int comboIndex)
 {
     // A is the main channel to rescale graphics. So B is not rescaling:
     //screen->setVoltCaliber((volt_items->at(comboIndex)).value);
-    acquisition->stop();
-    acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->at(comboIndex)).value);
-    acquisition->start();
+    if( NULL != acquisition )
+    {
+        acquisition->stop();
+        acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->at(comboIndex)).value);
+        acquisition->start();
+    }
 }
 
 void FrontPanel::setTimeChanged(int comboIndex)
 {
     screen->setTimeCaliber((time_items->at(comboIndex)).value);
-    acquisition->stop();
-    acquisition->set_timebase((time_items->at(comboIndex)).value);
-    acquisition->start();
+    if( NULL != acquisition )
+    {
+        acquisition->stop();
+        acquisition->set_timebase((time_items->at(comboIndex)).value);
+        acquisition->start();
+    }
 }
 
 void FrontPanel::setCurrentChanged(int comboIndex)
