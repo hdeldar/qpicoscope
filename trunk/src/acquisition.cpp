@@ -163,6 +163,7 @@ double Acquisition::adc_multipliers (short time_units)
 void Acquisition::start(void)
 {
     int ret = 0;
+    DEBUG("\n");
     sem_init(&thread_stop, 0, 0);
     ret = pthread_create(&thread_id, NULL, Acquisition::threadAcquisition, NULL);
     if( 0 != ret )
@@ -176,9 +177,13 @@ void Acquisition::start(void)
  ****************************************************************************/
 void Acquisition::stop(void)
 {
-    sem_post(&thread_stop);
-    pthread_join(thread_id, NULL);
-    thread_id = 0;
+    DEBUG("\n");
+    if( 0 != thread_id )
+    {
+        sem_post(&thread_stop);
+        pthread_join(thread_id, NULL);
+        thread_id = 0;
+    }
 }
 
 /****************************************************************************
