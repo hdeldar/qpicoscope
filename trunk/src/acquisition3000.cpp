@@ -59,19 +59,7 @@ Acquisition3000::Acquisition3000() :
     if ( unitOpened_m.handle < 1 )
     {
         DEBUG ( "Unable to open device\n" );
-        get_info ();
-        DEBUG ( "Opening the device...\n");
-
-        //open unit and show splash screen
-        unitOpened_m.handle = ps3000_open_unit ();
-        DEBUG ( "Handle: %d\n", unitOpened_m.handle );
-        if ( unitOpened_m.handle < 1 )
-        {
-            ERROR ( "Unable to open device\n" );
-            get_info ();
-            return;
-        }
-
+        return;
     }
 
 
@@ -934,7 +922,7 @@ void Acquisition3000::collect_fast_streaming (void)
     /* From here on, we can get data whenever we want...
     */
 
-    while (!unitOpened_m.trigger.advanced.autoStop && !sem_trywait(&thread_stop))
+    while ( !unitOpened_m.trigger.advanced.autoStop && sem_trywait(&thread_stop))
     {
 
         ps3000_get_streaming_last_values (unitOpened_m.handle, &Acquisition3000::ps3000FastStreamingReady);
