@@ -56,19 +56,7 @@ Acquisition2000::Acquisition2000() :
     if ( unitOpened_m.handle < 1 )
     {
         DEBUG ( "Unable to open device\n" );
-        get_info ();
-        DEBUG ( "Opening the device...\n");
-
-        //open unit and show splash screen
-        unitOpened_m.handle = ps2000_open_unit ();
-        DEBUG ( "Handle: %d\n", unitOpened_m.handle );
-        if ( unitOpened_m.handle < 1 )
-        {
-            ERROR ( "Unable to open device\n" );
-            get_info ();
-            return;
-        }
-
+        return;
     }
 
 
@@ -922,7 +910,7 @@ void Acquisition2000::collect_fast_streaming (void)
     /* From here on, we can get data whenever we want...
     */
 
-    while (!unitOpened_m.trigger.advanced.autoStop && !sem_trywait(&thread_stop))
+    while (!unitOpened_m.trigger.advanced.autoStop && sem_trywait(&thread_stop))
     {
 
         ps2000_get_streaming_last_values (unitOpened_m.handle, &Acquisition2000::ps2000FastStreamingReady);
