@@ -41,6 +41,7 @@
 
 #else
 /* Headers for Linux */
+#include <errno.h>
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -59,7 +60,8 @@
 #endif
 
 #define BUFFER_SIZE           1024
-#define BUFFER_SIZE_STREAMING 100000
+//#define BUFFER_SIZE_STREAMING 100000
+#define BUFFER_SIZE_STREAMING 10
 #define MAX_CHANNELS          4
 
 #define DEVICE_NAME_MAX       80
