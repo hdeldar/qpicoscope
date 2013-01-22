@@ -796,6 +796,8 @@ void Acquisition2000::collect_streaming (void)
     short  overflow;
     int     ok;
     short ch;
+    double values_mV[BUFFER_SIZE_STREAMING];
+    double time[BUFFER_SIZE_STREAMING];
 
     DEBUG ( "Collect streaming...\n" );
     DEBUG ( "Data is written to disk file (data.txt)\n" );
@@ -822,7 +824,7 @@ void Acquisition2000::collect_streaming (void)
     */
     block_no = 0;
     fp = fopen ( "data.txt", "w" );
-    while ( 1/*!kbhit ()*/ )
+    while ( sem_trywait(&thread_stop) )
     {
         no_of_values = ps2000_get_values ( unitOpened_m.handle,
             unitOpened_m.channelSettings[PS2000_CHANNEL_A].values,
@@ -858,9 +860,23 @@ void Acquisition2000::collect_streaming (void)
         else
             ERROR("Cannot open the file data.txt for writing. \nPlease ensure that you have permission to access. \n");
 
-        /* Wait 100ms before asking again
-        */
-        Sleep ( 100 );
+        for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+        {
+            if (unitOpened_m.channelSettings[ch].enabled)
+            {
+
+                for (  i = 0; i < no_of_values; i++ )
+                {
+                    values_mV[i] = adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    // TODO time will be probably wrong here, need to guess how to convert time range to time step...
+                    time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
+                }
+
+                draw->setData(ch+1, values_mV, time, no_of_values);
+            }
+
+        }
+
     }
     fclose ( fp );
 
