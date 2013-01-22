@@ -195,7 +195,7 @@ void* Acquisition::threadAcquisition(void* arg)
     (void)arg;
     if ( NULL != acquisition )
     {
-         acquisition->collect_fast_streaming();
+         acquisition->collect_streaming();
     }
     else
     {
