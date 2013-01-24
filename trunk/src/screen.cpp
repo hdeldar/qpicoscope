@@ -44,7 +44,6 @@
 Screen::Screen(QWidget *parent)
     : QwtPlot(parent)
 {
-
     initGradient();
 
     currentVoltCaliber = 0.;
@@ -78,6 +77,7 @@ Screen::Screen(QWidget *parent)
     curveC.attach(this);
     curveD.setStyle(QwtPlotCurve::Lines);
     curveD.attach(this);
+
 
 }
 
@@ -342,8 +342,7 @@ int8_t Screen::setData(uint8_t channel_id, double *x_data, double *y_data, uint3
         curve->setData( x_data + INT_MAX, y_data + INT_MAX, (int)(nb_points-INT_MAX));
 #endif
     }
-    //TODO: seems hazardous to call replot here...
-    //replot();
-
+    curve->draw(0, nb_points);
     return 0;
 }
+
