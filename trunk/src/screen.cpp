@@ -70,8 +70,14 @@ Screen::Screen(QWidget *parent)
     grid->attach(this);
    
     curveA.setStyle(QwtPlotCurve::Lines);
+    curveA.setPen(QPen(Qt::green));
+    curveA.setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curveA.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveA.attach(this);
     curveB.setStyle(QwtPlotCurve::Lines);
+    curveA.setPen(QPen(Qt::red));
+    curveA.setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curveA.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveB.attach(this);
     curveC.setStyle(QwtPlotCurve::Lines);
     curveC.attach(this);
@@ -207,6 +213,7 @@ void Screen::paintEvent(QPaintEvent * /* event */)
 //        paintShot(painter);
 //    if (!gameEnded)
 //        paintTarget(painter);
+    replot();
 }
 
 //void Screen::paintShot(QPainter &painter)
@@ -342,7 +349,7 @@ int8_t Screen::setData(uint8_t channel_id, double *x_data, double *y_data, uint3
         curve->setData( x_data + INT_MAX, y_data + INT_MAX, (int)(nb_points-INT_MAX));
 #endif
     }
-    curve->draw(0, nb_points);
+    update();
     return 0;
 }
 

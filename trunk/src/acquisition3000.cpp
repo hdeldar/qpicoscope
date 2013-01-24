@@ -840,7 +840,7 @@ void Acquisition3000::collect_streaming (void)
             BUFFER_SIZE );
         DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
 
-        for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+        for (ch = 0; ch < 1/*unitOpened_m.noOfChannels*/; ch++)
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
@@ -851,7 +851,7 @@ void Acquisition3000::collect_streaming (void)
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
                     //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
                     time[i] = i * 0.010;
-                    DEBUG("V: %lf T: %lf\n", values_V[i], time[i]);
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
                 }
 
                 draw->setData(ch+1, values_V, time, no_of_values);
