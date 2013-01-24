@@ -126,7 +126,7 @@ private:
     QwtPlotCurve curveB;
     QwtPlotCurve curveC;
     QwtPlotCurve curveD;
-
+    
 };
 
 #endif

@@ -74,8 +74,8 @@ typedef enum
     E_TRIGGER_FALLING
 }trigger_e;
 
-#define DEBUG(...)     fprintf(stderr, "%s\t- %s:\t[%d]\tDEBUG: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__)
-#define ERROR(...)     fprintf(stderr, "%s\t- %s:\t[%d]\tERROR: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__)
-#define WARNING(...)   fprintf(stderr, "%s\t- %s:\t[%d]\tWARNING: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__)
+#define DEBUG(...)     do{ fprintf(stderr, "%s\t- %s:\t[%d]\tDEBUG: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__); }while(0)
+#define ERROR(...)     do{ fprintf(stderr, "%s\t- %s:\t[%d]\tERROR: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__); }while(0)
+#define WARNING(...)   do{ fprintf(stderr, "%s\t- %s:\t[%d]\tWARNING: ",__FILE__, __FUNCTION__,__LINE__); fprintf(stderr, __VA_ARGS__); }while(0)
 
 #endif // OSCILLOSCOPE_H

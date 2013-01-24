@@ -801,20 +801,16 @@ void Acquisition3000::collect_block_ets (void)
 
 void Acquisition3000::collect_streaming (void)
 {
-    int        i;
-    int        block_no;
-    FILE     *fp;
-    int        no_of_values;
+    int    i;
+    FILE   *fp = NULL;
+    int    no_of_values;
     short  overflow;
-    int     ok;
-    short ch;
-    double values_mV[BUFFER_SIZE_STREAMING];
-    double time[BUFFER_SIZE_STREAMING];
-
+    int    ok;
+    short  ch;
+    double values_V[BUFFER_SIZE];
+    double time[BUFFER_SIZE];
     DEBUG ( "Collect streaming...\n" );
     DEBUG ( "Data is written to disk file (data.txt)\n" );
-    DEBUG ( "Press a key to start\n" );
-    //getch ();
 
     set_defaults ();
 
@@ -832,45 +828,17 @@ void Acquisition3000::collect_streaming (void)
     ok = ps3000_run_streaming ( unitOpened_m.handle, 10, 1000, 0 );
     DEBUG ( "OK: %d\n", ok );
 
-    /* From here on, we can get data whenever we want...
-    */
-    block_no = 0;
-    fp = fopen ( "data.txt", "w" );
+    
     while ( sem_trywait(&thread_stop) )
     {
         no_of_values = ps3000_get_values ( unitOpened_m.handle,
             unitOpened_m.channelSettings[PS3000_CHANNEL_A].values,
             unitOpened_m.channelSettings[PS3000_CHANNEL_B].values,
-            NULL,
-            NULL,
+            unitOpened_m.channelSettings[PS3000_CHANNEL_C].values,
+            unitOpened_m.channelSettings[PS3000_CHANNEL_D].values,
             &overflow,
             BUFFER_SIZE );
-        DEBUG ( "%d values\n", no_of_values );
-
-        if ( block_no++ > 20 )
-        {
-            block_no = 0;
-            DEBUG ( "Press any key to stop\n" );
-        }
-
-        /* Print out the first 10 readings
-        */
-        if (fp != NULL)
-        {
-            for ( i = 0; i < no_of_values; i++ )
-            {
-                for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
-                {
-                    if (unitOpened_m.channelSettings[ch].enabled)
-                    {
-                        fprintf ( fp, "%d, ", adc_to_mv (unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range) );
-                    }
-                }
-                fprintf (fp, "\n");
-            }
-        }
-        else
-            ERROR("Cannot open the file data.txt for writing. \nPlease ensure that you have permission to access. \n");
+        DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
 
         for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
         {
@@ -879,22 +847,24 @@ void Acquisition3000::collect_streaming (void)
 
                 for (  i = 0; i < no_of_values; i++ )
                 {
-                    values_mV[i] = adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
-                    time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
+                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
+                    time[i] = i * 0.010;
+                    DEBUG("V: %lf T: %lf\n", values_V[i], time[i]);
                 }
 
-                draw->setData(ch+1, values_mV, time, no_of_values);
+                draw->setData(ch+1, values_V, time, no_of_values);
             }
 
         }
-
+        Sleep(100);
     }
-    fclose ( fp );
+    if (fp != NULL)
+        fclose ( fp );
 
     ps3000_stop ( unitOpened_m.handle );
 
-    //getch ();
 }
 
 void Acquisition3000::collect_fast_streaming (void)

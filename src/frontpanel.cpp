@@ -99,7 +99,9 @@ FrontPanel::FrontPanel(QWidget *parent)
         connect(volt_channel_A, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
         leftLayout->addWidget(volt_channel_A);
         // set screen values
-        setVoltChannelAChanged(0);
+        if(NULL != acquisition)
+            acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->at(0)).value);
+        
     }
 
     if(device_info.nb_channels >= 2)
@@ -112,7 +114,8 @@ FrontPanel::FrontPanel(QWidget *parent)
         connect(volt_channel_B, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
         leftLayout->addWidget(volt_channel_B);
         // set screen values
-        setVoltChannelBChanged(0);
+        if(NULL != acquisition)
+            acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->at(0)).value);
     }
 
     time = new ComboRange(tr("TIME/DIV"));
@@ -123,7 +126,8 @@ FrontPanel::FrontPanel(QWidget *parent)
     connect(time, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
     leftLayout->addWidget(time);
     // set screen values
-    setTimeChanged(0);
+    if(NULL != acquisition)
+        acquisition->set_timebase((time_items->at(0)).value);
 
     current = new ComboRange(tr("CURRENT"));
     for(uint32_t i = 0; i < current_items->size(); i++)
@@ -160,6 +164,9 @@ FrontPanel::FrontPanel(QWidget *parent)
     gridLayout->addWidget(screenBox, 1, 1, 2, 1);
     gridLayout->setColumnStretch(1, 10);
     setLayout(gridLayout);
+
+    // start acquisition:
+    acquisition->start();
 
 }
 

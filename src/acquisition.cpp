@@ -163,13 +163,19 @@ double Acquisition::adc_multipliers (short time_units)
 void Acquisition::start(void)
 {
     int ret = 0;
-    DEBUG("\n");
-    sem_init(&thread_stop, 0, 0);
-    ret = pthread_create(&thread_id, NULL, Acquisition::threadAcquisition, NULL);
-    if( 0 != ret )
+    if(0 == thread_id)
     {
-        ERROR("pthread_create failed and returned %d\n", ret);
-        thread_id = 0;
+        sem_init(&thread_stop, 0, 0);
+        ret = pthread_create(&thread_id, NULL, Acquisition::threadAcquisition, NULL);
+        if( 0 != ret )
+        {
+            ERROR("pthread_create failed and returned %d\n", ret);
+            thread_id = 0;
+        }
+        else
+        {
+            DEBUG("thread id is %d\n", thread_id);
+        }
     }
 }
 /****************************************************************************
@@ -177,9 +183,9 @@ void Acquisition::start(void)
  ****************************************************************************/
 void Acquisition::stop(void)
 {
-    DEBUG("\n");
     if( 0 != thread_id )
     {
+        DEBUG("thread id is %d\n", thread_id);
         sem_post(&thread_stop);
         pthread_join(thread_id, NULL);
         thread_id = 0;
@@ -201,7 +207,7 @@ void* Acquisition::threadAcquisition(void* arg)
     {
         ERROR("Failed to retrieve acquisition's instance\n");
     }
-    
-   return NULL;
+   
+   pthread_exit(NULL); 
 }
 
