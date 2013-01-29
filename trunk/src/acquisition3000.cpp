@@ -801,16 +801,15 @@ void Acquisition3000::collect_block_ets (void)
 
 void Acquisition3000::collect_streaming (void)
 {
-    int    i;
-    FILE   *fp = NULL;
+    int    i = 0;
+    int count = 0;
     int    no_of_values;
     short  overflow;
     int    ok;
     short  ch;
-    double values_V[BUFFER_SIZE];
-    double time[BUFFER_SIZE];
+    double values_V[BUFFER_SIZE] = {0};
+    double time[BUFFER_SIZE] = {0};
     DEBUG ( "Collect streaming...\n" );
-    DEBUG ( "Data is written to disk file (data.txt)\n" );
 
     set_defaults ();
 
@@ -818,14 +817,14 @@ void Acquisition3000::collect_streaming (void)
     */
     ps3000_set_trigger ( unitOpened_m.handle, PS3000_NONE, 0, 0, 0, 0 );
 
-    /* Collect data at 10ms intervals
+    /* Collect data at time_per_division_m / 100  intervals
     * Max BUFFER_SIZE points on each call
     *  (buffer must be big enough for max time between calls
     *
     *  Start it collecting,
     *  then wait for trigger event
     */
-    ok = ps3000_run_streaming ( unitOpened_m.handle, 10, 1000, 0 );
+    ok = ps3000_run_streaming ( unitOpened_m.handle, (time_per_division_m * 1000. / 100.) , 1000, 0 );
     DEBUG ( "OK: %d\n", ok );
 
     
@@ -838,30 +837,36 @@ void Acquisition3000::collect_streaming (void)
             unitOpened_m.channelSettings[PS3000_CHANNEL_D].values,
             &overflow,
             BUFFER_SIZE );
-        DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
+        //DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
 
-        for (ch = 0; ch < 1/*unitOpened_m.noOfChannels*/; ch++)
+        for (ch = 0; (ch < unitOpened_m.noOfChannels) && (no_of_values > 0); ch++)
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
 
-                for (  i = 0; i < no_of_values; i++ )
+                for (  i = 0; i < no_of_values; i++, count++ )
                 {
-                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
-                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
-                    time[i] = i * 0.010;
-                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
+                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
+                    time[count] = count * 0.01 * time_per_division_m;
+                    //DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
+                    // 500 points are making a screen:
+                    if(count == 500)
+                    {
+                        count = 0;
+                        memset(time, 0, BUFFER_SIZE * sizeof(double));
+                        memset(values_V, 0, BUFFER_SIZE * sizeof(double));
+                    }
                 }
+                
+                draw->setData(ch+1, time, values_V, 500);
 
-                draw->setData(ch+1, values_V, time, no_of_values);
             }
 
         }
         Sleep(100);
     }
-    if (fp != NULL)
-        fclose ( fp );
 
     ps3000_stop ( unitOpened_m.handle );
 
@@ -1390,7 +1395,8 @@ void Acquisition3000::set_timebase (double time_per_division)
   long   max_samples = 0;
 
   DEBUG ( "Specify timebase\n" );
-
+  time_per_division_m = time_per_division;
+  
   /* See what ranges are available...
    */
   for (i = 0; i < unitOpened_m.timebases; i++)
@@ -1446,8 +1452,11 @@ void Acquisition3000::set_timebase (double time_per_division)
       if ( time_interval > 0 )
       {
           DEBUG ( "%d -> %ld %s  %hd\n", i, time_interval, adc_units(time_units), time_units );
-          if((time_interval * adc_multipliers(time_units)) > (time_per_division * 5.)){
+          //if((time_interval * adc_multipliers(time_units)) > (time_per_division * 5.)){
+          if((time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
               timebase = i;
+          }
+          else if((time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
               break;
           }
       }

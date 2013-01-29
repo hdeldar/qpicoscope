@@ -166,7 +166,8 @@ FrontPanel::FrontPanel(QWidget *parent)
     setLayout(gridLayout);
 
     // start acquisition:
-    acquisition->start();
+    if(NULL != acquisition)
+        acquisition->start();
 
 }
 

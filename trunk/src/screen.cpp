@@ -75,9 +75,9 @@ Screen::Screen(QWidget *parent)
     curveA.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveA.attach(this);
     curveB.setStyle(QwtPlotCurve::Lines);
-    curveA.setPen(QPen(Qt::red));
-    curveA.setRenderHint(QwtPlotItem::RenderAntialiased, true);
-    curveA.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+    curveB.setPen(QPen(Qt::red));
+    curveB.setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curveB.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveB.attach(this);
     curveC.setStyle(QwtPlotCurve::Lines);
     curveC.attach(this);
@@ -111,7 +111,8 @@ void Screen::setVoltCaliber(double voltCaliber)
     //emit voltCaliberChanged(currentVoltCaliber);
     setAxisScale(QwtPlot::yLeft,-(5*currentVoltCaliber),(5*currentVoltCaliber), currentVoltCaliber);
     // update all:
-    replot();
+    //replot();
+    update();
 }
 
 void Screen::setTimeCaliber(double timeCaliber)
@@ -123,7 +124,8 @@ void Screen::setTimeCaliber(double timeCaliber)
     currentTimeCaliber = timeCaliber;
     setAxisScale(QwtPlot::xBottom, 0.0, 5*currentTimeCaliber, currentTimeCaliber);
     // update all:
-    replot();
+    //replot();
+    update();
     //emit timeCaliberChanged(currentTimeCaliber);
 }
 
@@ -185,9 +187,10 @@ void Screen::mouseReleaseEvent(QMouseEvent *event)
 }
 //! [5]
 
-void Screen::paintEvent(QPaintEvent * /* event */)
+void Screen::paintEvent(QPaintEvent *event)
 {
 
+    (void)event;
 //    QPainter painter(this);
 //    painter.drawText(200, 140,
 //                     tr("Volt/div = ") + QString::number(currentVoltCaliber));
@@ -213,6 +216,7 @@ void Screen::paintEvent(QPaintEvent * /* event */)
 //        paintShot(painter);
 //    if (!gameEnded)
 //        paintTarget(painter);
+    // TODO calling replot here is freezing the mainwindow.... But not calling it will never show the curves...
     replot();
 }
 
@@ -239,7 +243,7 @@ void Screen::paintEvent(QPaintEvent * /* event */)
 //}
 //! [7]
 
-const QRect barrelRect(30, -5, 20, 10);
+//const QRect barrelRect(30, -5, 20, 10);
 
 //QRect Screen::cannonRect() const
 //{
