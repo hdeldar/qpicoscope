@@ -789,20 +789,16 @@ void Acquisition2000::collect_block_ets (void)
 
 void Acquisition2000::collect_streaming (void)
 {
-    int        i;
-    int        block_no;
-    FILE     *fp;
-    int        no_of_values;
+    int    i = 0;
+    int count = 0;
+    int    no_of_values;
     short  overflow;
-    int     ok;
-    short ch;
-    double values_mV[BUFFER_SIZE_STREAMING];
-    double time[BUFFER_SIZE_STREAMING];
-
+    int    ok;
+    short  ch;
+    double values_V[BUFFER_SIZE] = {0};
+    double time[BUFFER_SIZE] = {0};
     DEBUG ( "Collect streaming...\n" );
     DEBUG ( "Data is written to disk file (data.txt)\n" );
-    DEBUG ( "Press a key to start\n" );
-    //getch ();
 
     set_defaults ();
 
@@ -810,79 +806,57 @@ void Acquisition2000::collect_streaming (void)
     */
     ps2000_set_trigger ( unitOpened_m.handle, PS2000_NONE, 0, 0, 0, 0 );
 
-    /* Collect data at 10ms intervals
+    /* Collect data at time_per_division_m / 100  intervals
     * Max BUFFER_SIZE points on each call
     *  (buffer must be big enough for max time between calls
     *
     *  Start it collecting,
     *  then wait for trigger event
     */
-    ok = ps2000_run_streaming ( unitOpened_m.handle, 10, 1000, 0 );
+    ok = ps2000_run_streaming ( unitOpened_m.handle, (time_per_division_m * 1000. / 100.), 1000, 0 );
     DEBUG ( "OK: %d\n", ok );
 
     /* From here on, we can get data whenever we want...
     */
-    block_no = 0;
-    fp = fopen ( "data.txt", "w" );
     while ( sem_trywait(&thread_stop) )
     {
         no_of_values = ps2000_get_values ( unitOpened_m.handle,
             unitOpened_m.channelSettings[PS2000_CHANNEL_A].values,
             unitOpened_m.channelSettings[PS2000_CHANNEL_B].values,
-            NULL,
-            NULL,
+            unitOpened_m.channelSettings[PS2000_CHANNEL_C].values,
+            unitOpened_m.channelSettings[PS2000_CHANNEL_D].values,
             &overflow,
             BUFFER_SIZE );
-        DEBUG ( "%d values\n", no_of_values );
+        DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
 
-        if ( block_no++ > 20 )
-        {
-            block_no = 0;
-            DEBUG ( "Press any key to stop\n" );
-        }
-
-        /* Print out the first 10 readings
-        */
-        if (fp != NULL)
-        {
-            for ( i = 0; i < no_of_values; i++ )
-            {
-                for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
-                {
-                    if (unitOpened_m.channelSettings[ch].enabled)
-                    {
-                        fprintf ( fp, "%d, ", adc_to_mv (unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range) );
-                    }
-                }
-                fprintf (fp, "\n");
-            }
-        }
-        else
-            ERROR("Cannot open the file data.txt for writing. \nPlease ensure that you have permission to access. \n");
-
-        for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+        for (ch = 0; (ch < unitOpened_m.noOfChannels) && (no_of_values > 0); ch++)
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
 
-                for (  i = 0; i < no_of_values; i++ )
+                for (  i = 0; i < no_of_values; i++, count++ )
                 {
-                    values_mV[i] = adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
-                    time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range;
+                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
+                    time[count] = count * 0.01 * time_per_division_m;
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
+                    // 500 points are making a screen:
+                    if(count == 500)
+                    {
+                        draw->setData(ch+1, time, values_V, 500);
+                        count = 0;
+                    }
                 }
 
-                draw->setData(ch+1, values_mV, time, no_of_values);
             }
 
         }
-
+        Sleep(100);
     }
-    fclose ( fp );
 
     ps2000_stop ( unitOpened_m.handle );
 
-    //getch ();
 }
 
 void Acquisition2000::collect_fast_streaming (void)

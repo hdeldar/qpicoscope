@@ -222,6 +222,7 @@ private:
     static Acquisition2000 *singleton_m;
     int scale_to_mv;
     short timebase;
+    double time_per_division_m;
     long times[BUFFER_SIZE];
     static const short input_ranges [PS2000_MAX_RANGES] /*= {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000}*/;
 };

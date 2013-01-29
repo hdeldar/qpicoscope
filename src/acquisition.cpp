@@ -174,7 +174,7 @@ void Acquisition::start(void)
         }
         else
         {
-            DEBUG("thread id is %d\n", thread_id);
+            DEBUG("thread id is %lu\n", thread_id);
         }
     }
 }
@@ -185,7 +185,7 @@ void Acquisition::stop(void)
 {
     if( 0 != thread_id )
     {
-        DEBUG("thread id is %d\n", thread_id);
+        DEBUG("thread id is %lu\n", thread_id);
         sem_post(&thread_stop);
         pthread_join(thread_id, NULL);
         thread_id = 0;
