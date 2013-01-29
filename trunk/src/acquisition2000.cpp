@@ -798,7 +798,6 @@ void Acquisition2000::collect_streaming (void)
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     DEBUG ( "Collect streaming...\n" );
-    DEBUG ( "Data is written to disk file (data.txt)\n" );
 
     set_defaults ();
 
@@ -816,8 +815,7 @@ void Acquisition2000::collect_streaming (void)
     ok = ps2000_run_streaming ( unitOpened_m.handle, (time_per_division_m * 1000. / 100.), 1000, 0 );
     DEBUG ( "OK: %d\n", ok );
 
-    /* From here on, we can get data whenever we want...
-    */
+    
     while ( sem_trywait(&thread_stop) )
     {
         no_of_values = ps2000_get_values ( unitOpened_m.handle,
@@ -844,10 +842,13 @@ void Acquisition2000::collect_streaming (void)
                     // 500 points are making a screen:
                     if(count == 500)
                     {
-                        draw->setData(ch+1, time, values_V, 500);
                         count = 0;
+                        memset(time, 0, BUFFER_SIZE * sizeof(double));
+                        memset(values_V, 0, BUFFER_SIZE * sizeof(double));
                     }
                 }
+                
+                draw->setData(ch+1, time, values_V, 500);
 
             }
 
@@ -1324,7 +1325,8 @@ void Acquisition2000::set_timebase (double time_per_division)
   long   max_samples = 0;
 
   DEBUG ( "Specify timebase\n" );
-
+  time_per_division_m = time_per_division;
+  
   /* See what ranges are available...
    */
   for (i = 0; i < unitOpened_m.timebases; i++)
@@ -1380,8 +1382,10 @@ void Acquisition2000::set_timebase (double time_per_division)
       if ( time_interval > 0 )
       {
           DEBUG ( "%d -> %ld %s  %hd\n", i, time_interval, adc_units(time_units), time_units );
-          if((time_interval * adc_multipliers(time_units)) > (time_per_division * 5.)){
+          if((time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
               timebase = i;
+          }
+          else if((time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
               break;
           }
       }

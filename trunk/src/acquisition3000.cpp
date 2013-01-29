@@ -837,7 +837,7 @@ void Acquisition3000::collect_streaming (void)
             unitOpened_m.channelSettings[PS3000_CHANNEL_D].values,
             &overflow,
             BUFFER_SIZE );
-        //DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
+        DEBUG ( "%d values, overflow %d\n", no_of_values, overflow );
 
         for (ch = 0; (ch < unitOpened_m.noOfChannels) && (no_of_values > 0); ch++)
         {
@@ -850,7 +850,7 @@ void Acquisition3000::collect_streaming (void)
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
                     //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
                     time[count] = count * 0.01 * time_per_division_m;
-                    //DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
                     // 500 points are making a screen:
                     if(count == 500)
                     {
@@ -1452,7 +1452,6 @@ void Acquisition3000::set_timebase (double time_per_division)
       if ( time_interval > 0 )
       {
           DEBUG ( "%d -> %ld %s  %hd\n", i, time_interval, adc_units(time_units), time_units );
-          //if((time_interval * adc_multipliers(time_units)) > (time_per_division * 5.)){
           if((time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
               timebase = i;
           }
