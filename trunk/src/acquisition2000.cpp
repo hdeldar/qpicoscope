@@ -334,8 +334,8 @@ void Acquisition2000::collect_block_immediate (void)
         ps2000_get_times_and_values ( unitOpened_m.handle, times,
                                     unitOpened_m.channelSettings[PS2000_CHANNEL_A].values,
                                     unitOpened_m.channelSettings[PS2000_CHANNEL_B].values,
-                                    NULL,
-                                    NULL,
+                                    unitOpened_m.channelSettings[PS2000_CHANNEL_C].values,
+                                    unitOpened_m.channelSettings[PS2000_CHANNEL_D].values,
                                     &overflow, time_units, no_of_samples );
 
         DEBUG ( "%d values, overflow %d\n", no_of_samples, overflow );
@@ -360,7 +360,7 @@ void Acquisition2000::collect_block_immediate (void)
                         memset(values_V, 0, BUFFER_SIZE * sizeof(double));
                     }
                 }
-                draw->setData(ch+1, time, values_V, 500);
+                draw->setData(ch+1, time, values_V, count);
             }
         }
         Sleep(100);
@@ -839,7 +839,7 @@ void Acquisition2000::collect_streaming (void)
                     }
                 }
                 
-                draw->setData(ch+1, time, values_V, 500);
+                draw->setData(ch+1, time, values_V, count);
 
             }
 

@@ -346,8 +346,8 @@ void Acquisition3000::collect_block_immediate (void)
         ps3000_get_times_and_values ( unitOpened_m.handle, times,
                                     unitOpened_m.channelSettings[PS3000_CHANNEL_A].values,
                                     unitOpened_m.channelSettings[PS3000_CHANNEL_B].values,
-                                    NULL,
-                                    NULL,
+                                    unitOpened_m.channelSettings[PS3000_CHANNEL_C].values,
+                                    unitOpened_m.channelSettings[PS3000_CHANNEL_D].values,
                                     &overflow, time_units, no_of_samples );
 
         DEBUG ( "%d values, overflow %d\n", no_of_samples, overflow );
@@ -372,7 +372,7 @@ void Acquisition3000::collect_block_immediate (void)
                         memset(values_V, 0, BUFFER_SIZE * sizeof(double));
                     }
                 }
-                draw->setData(ch+1, time, values_V, 500);
+                draw->setData(ch+1, time, values_V, count);
             }
         }
         Sleep(100);
@@ -851,7 +851,7 @@ void Acquisition3000::collect_streaming (void)
                     }
                 }
                 
-                draw->setData(ch+1, time, values_V, 500);
+                draw->setData(ch+1, time, values_V, count);
 
             }
 
@@ -1464,6 +1464,8 @@ void Acquisition3000::set_timebase (double time_per_division)
 void Acquisition3000::set_voltages (channel_e channel_index, double volts_per_division)
 {
     uint8_t i = 0;
+
+    DEBUG("channel index %d, volts/div %lf\n", channel_index, volts_per_division);
 
     if (channel_index >= unitOpened_m.noOfChannels || channel_index >=CHANNEL_MAX)
     {

@@ -362,6 +362,7 @@ void FrontPanel::create_menu_items()
 
 void FrontPanel::setVoltChannelAChanged(int comboIndex)
 {
+    DEBUG("Combo index %d\n", comboIndex);
     screen->setVoltCaliber((volt_items->at(comboIndex)).value);
     if( NULL != acquisition )
     {
@@ -373,6 +374,7 @@ void FrontPanel::setVoltChannelAChanged(int comboIndex)
 
 void FrontPanel::setVoltChannelBChanged(int comboIndex)
 {
+    DEBUG("Combo index %d\n", comboIndex);
     // A is the main channel to rescale graphics. So B is not rescaling:
     //screen->setVoltCaliber((volt_items->at(comboIndex)).value);
     if( NULL != acquisition )
@@ -385,6 +387,7 @@ void FrontPanel::setVoltChannelBChanged(int comboIndex)
 
 void FrontPanel::setTimeChanged(int comboIndex)
 {
+    DEBUG("Combo index %d\n", comboIndex);
     screen->setTimeCaliber((time_items->at(comboIndex)).value);
     if( NULL != acquisition )
     {
@@ -396,12 +399,14 @@ void FrontPanel::setTimeChanged(int comboIndex)
 
 void FrontPanel::setCurrentChanged(int comboIndex)
 {
+    DEBUG("Combo index %d\n", comboIndex);
     screen->setCurrent((current_items->at(comboIndex)).value);
     // TODO set acquisition accordingly
 }
 
 void FrontPanel::setTriggerChanged(int comboIndex)
 {
+    DEBUG("Combo index %d\n", comboIndex);
     screen->setTrigger((trigger_items->at(comboIndex)).value);
     // TODO set acquisition accordingly
 }
