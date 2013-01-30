@@ -289,138 +289,129 @@ void Acquisition3000::set_trigger_advanced(void)
  ****************************************************************************/
 void Acquisition3000::collect_block_immediate (void)
 {
-  int        i;
-  long     time_interval;
-  short     time_units;
-  short     oversample;
-  long     no_of_samples = BUFFER_SIZE;
-  FILE     *fp;
-  short     auto_trigger_ms = 0;
-  long     time_indisposed_ms;
-  short     overflow;
-  long     max_samples;
+    int i = 0;
+    int count = 0;
+    long     time_interval;
+    short     time_units;
+    short     oversample;
+    int     no_of_samples = BUFFER_SIZE;
+    short     auto_trigger_ms = 0;
+    long     time_indisposed_ms;
+    short     overflow;
+    long     max_samples;
     short ch = 0;
+    double values_V[BUFFER_SIZE] = {0};
+    double time[BUFFER_SIZE] = {0};
 
-  DEBUG ( "Collect block immediate...\n" );
-  DEBUG ( "Press a key to start\n" );
-  ////getch ();
+    DEBUG ( "Collect block immediate...\n" );
 
-  set_defaults ();
+    set_defaults ();
 
-  /* Trigger disabled
-   */
-  ps3000_set_trigger ( unitOpened_m.handle, PS3000_NONE, 0, PS3000_RISING, 0, auto_trigger_ms );
+    /* Trigger disabled
+    */
+    ps3000_set_trigger ( unitOpened_m.handle, PS3000_NONE, 0, PS3000_RISING, 0, auto_trigger_ms );
 
-  /*  find the maximum number of samples, the time interval (in time_units),
-   *         the most suitable time units, and the maximum oversample at the current timebase
-   */
-  oversample = 1;
-  while (!ps3000_get_timebase ( unitOpened_m.handle,
+    /*  find the maximum number of samples, the time interval (in time_units),
+    *         the most suitable time units, and the maximum oversample at the current timebase
+    */
+    oversample = 1;
+    while (!ps3000_get_timebase ( unitOpened_m.handle,
                                 timebase,
                                 no_of_samples,
                                 &time_interval,
                                 &time_units,
                                 oversample,
                                 &max_samples))
-  timebase++;                                        ;
+    timebase++;                                        ;
 
-  DEBUG ( "timebase: %hd\toversample:%hd\n", timebase, oversample );
-  /* Start it collecting,
-   *  then wait for completion
-   */
-  ps3000_run_block ( unitOpened_m.handle, no_of_samples, timebase, oversample, &time_indisposed_ms );
-  while ( !ps3000_ready ( unitOpened_m.handle ) )
-  {
-    Sleep ( 100 );
-  }
+    DEBUG ( "timebase: %hd\toversample:%hd\n", timebase, oversample );
 
-  ps3000_stop ( unitOpened_m.handle );
-
-  /* Should be done now...
-   *  get the times (in nanoseconds)
-   *   and the values (in ADC counts)
-   */
-  ps3000_get_times_and_values ( unitOpened_m.handle, times,
-                                unitOpened_m.channelSettings[PS3000_CHANNEL_A].values,
-                                unitOpened_m.channelSettings[PS3000_CHANNEL_B].values,
-                                NULL,
-                                NULL,
-                                &overflow, time_units, no_of_samples );
-
-  /* Print out the first 10 readings,
-   *  converting the readings to mV if required
-   */
-  DEBUG ( "First 10 readings\n" );
-  DEBUG ( "Value\n" );
-  DEBUG ( "(%s)\n", adc_units ( time_units ) );
-
-  for ( i = 0; i < 10; i++ )
-  {
-        for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
-        {
-            if(unitOpened_m.channelSettings[ch].enabled)
-            {
-                DEBUG ( "%d\t", adc_to_mv ( unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range) );
-            }
-        }
-        DEBUG("\n");
-  }
-
-  fp = fopen ( "data.txt","w" );
-  if (fp != NULL)
-  {
-    for ( i = 0; i < BUFFER_SIZE; i++)
+    while ( sem_trywait(&thread_stop) )
     {
-            fprintf ( fp,"%ld ", times[i]);
-            for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
-            {
-                if(unitOpened_m.channelSettings[ch].enabled)
-                {
-                    fprintf ( fp, ",%d, %d,", unitOpened_m.channelSettings[ch].values[i],
-                                                                        adc_to_mv ( unitOpened_m.channelSettings[ch].values[i],    unitOpened_m.channelSettings[ch].range) );
-                }
-            }
-            fprintf(fp, "\n");
+        /* Start it collecting,
+        *  then wait for completion
+        */
+        ps3000_run_block ( unitOpened_m.handle, no_of_samples, timebase, oversample, &time_indisposed_ms );
+        while ( !ps3000_ready ( unitOpened_m.handle ) )
+        {
+        Sleep ( 100 );
         }
-    fclose(fp);
-  }
-  else
-    ERROR("Cannot open the file data.txt for writing. \nPlease ensure that you have permission to access. \n");
-}
 
-/****************************************************************************
- * Collect_block_triggered
- *  this function demonstrates how to collect a single block of data from the
- *  unit, when a trigger event occurs.
- ****************************************************************************/
+        ps3000_stop ( unitOpened_m.handle );
 
-void Acquisition3000::collect_block_triggered (void)
-  {
-  int        i;
-  int        trigger_sample;
-  long     time_interval;
-  short     time_units;
-  short     oversample;
-  long     no_of_samples = BUFFER_SIZE;
-  FILE     *fp;
-  short     auto_trigger_ms = 0;
-  long     time_indisposed_ms;
-  short     overflow;
-  int     threshold_mv =1500;
-  long     max_samples;
-    short ch;
+        /* Should be done now...
+        *  get the times (in nanoseconds)
+        *   and the values (in ADC counts)
+        */
+        ps3000_get_times_and_values ( unitOpened_m.handle, times,
+                                    unitOpened_m.channelSettings[PS3000_CHANNEL_A].values,
+                                    unitOpened_m.channelSettings[PS3000_CHANNEL_B].values,
+                                    NULL,
+                                    NULL,
+                                    &overflow, time_units, no_of_samples );
 
-  DEBUG ( "Collect block triggered...\n" );
-  DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
-  DEBUG ( "Press a key to start...\n" );
-  //getch ();
+        DEBUG ( "%d values, overflow %d\n", no_of_samples, overflow );
 
-  set_defaults ();
+        for (ch = 0; (ch < unitOpened_m.noOfChannels) && (no_of_samples > 0); ch++)
+        {
+            if (unitOpened_m.channelSettings[ch].enabled)
+            {
 
-  /* Trigger enabled
-     * ChannelA - to trigger unsing this channel it needs to be enabled using ps3000_set_channel
-   * Rising edge
-   * Threshold = 100mV
+                for (  i = 0; i < no_of_samples; i++, count++ )
+                {
+                    values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    // TODO time will be probably wrong here, need to guess how to convert time range to time step...
+                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
+                    time[count] = count * 0.01 * time_per_division_m;
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
+                    // 500 points are making a screen:
+                    if(count == 500)
+                    {
+                        count = 0;
+                        memset(time, 0, BUFFER_SIZE * sizeof(double));
+                        memset(values_V, 0, BUFFER_SIZE * sizeof(double));
+                    }
+                }
+                draw->setData(ch+1, time, values_V, 500);
+            }
+        }
+        Sleep(100);
+        }
+    }
+
+    /****************************************************************************
+     * Collect_block_triggered
+     *  this function demonstrates how to collect a single block of data from the
+     *  unit, when a trigger event occurs.
+     ****************************************************************************/
+
+    void Acquisition3000::collect_block_triggered (void)
+      {
+      int        i;
+      int        trigger_sample;
+      long     time_interval;
+      short     time_units;
+      short     oversample;
+      long     no_of_samples = BUFFER_SIZE;
+      FILE     *fp;
+      short     auto_trigger_ms = 0;
+      long     time_indisposed_ms;
+      short     overflow;
+      int     threshold_mv =1500;
+      long     max_samples;
+        short ch;
+
+      DEBUG ( "Collect block triggered...\n" );
+      DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
+      DEBUG ( "Press a key to start...\n" );
+      //getch ();
+
+      set_defaults ();
+
+      /* Trigger enabled
+         * ChannelA - to trigger unsing this channel it needs to be enabled using ps3000_set_channel
+       * Rising edge
+       * Threshold = 100mV
    * 10% pre-trigger  (negative is pre-, positive is post-)
    */
     unitOpened_m.trigger.simple.channel = PS3000_CHANNEL_A;
