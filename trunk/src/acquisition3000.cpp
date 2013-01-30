@@ -334,7 +334,7 @@ void Acquisition3000::collect_block_immediate (void)
         ps3000_run_block ( unitOpened_m.handle, no_of_samples, timebase, oversample, &time_indisposed_ms );
         while ( !ps3000_ready ( unitOpened_m.handle ) )
         {
-        Sleep ( 100 );
+            Sleep ( 100 );
         }
 
         ps3000_stop ( unitOpened_m.handle );
@@ -376,8 +376,8 @@ void Acquisition3000::collect_block_immediate (void)
             }
         }
         Sleep(100);
-        }
     }
+}
 
     /****************************************************************************
      * Collect_block_triggered
