@@ -80,8 +80,14 @@ Screen::Screen(QWidget *parent)
     curveB.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveB.attach(this);
     curveC.setStyle(QwtPlotCurve::Lines);
+    curveC.setPen(QPen(Qt::magenta));
+    curveC.setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curveC.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveC.attach(this);
     curveD.setStyle(QwtPlotCurve::Lines);
+    curveD.setPen(QPen(Qt::yellow));
+    curveD.setRenderHint(QwtPlotItem::RenderAntialiased, true);
+    curveD.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveD.attach(this);
 
 
