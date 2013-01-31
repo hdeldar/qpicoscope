@@ -203,6 +203,7 @@ void* Acquisition::threadAcquisition(void* arg)
     {
          //acquisition->collect_streaming();
          acquisition->collect_block_immediate();
+         //acquisition->collect_block_triggered();
     }
     else
     {
