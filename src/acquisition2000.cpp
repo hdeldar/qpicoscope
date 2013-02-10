@@ -290,6 +290,7 @@ void Acquisition2000::collect_block_immediate (void)
     short ch = 0;
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
+    double time_multiplier = 0.;
 
     DEBUG ( "Collect block immediate...\n" );
 
@@ -312,7 +313,8 @@ void Acquisition2000::collect_block_immediate (void)
                                 &max_samples))
     timebase++;                                        ;
 
-    DEBUG ( "timebase: %hd\toversample:%hd\n", timebase, oversample );
+    time_multiplier = adc_multipliers(time_units);
+    DEBUG ( "timebase: %hd\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%f\n", timebase, oversample, time_units, time_interval, time_multiplier );
 
     while ( sem_trywait(&thread_stop) )
     {
@@ -350,7 +352,7 @@ void Acquisition2000::collect_block_immediate (void)
                     values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
                     //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
-                    time[count] = count * 0.01 * time_per_division_m;
+                    time[count] = count * time_interval * time_multiplier;
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
                     // 500 points are making a screen:
                     if(count == 500)
@@ -390,6 +392,7 @@ void Acquisition2000::collect_block_triggered (void)
     short ch;
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
+    double time_multiplier = 0.;
 
     DEBUG ( "Collect block triggered...\n" );
     DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
@@ -427,6 +430,8 @@ void Acquisition2000::collect_block_triggered (void)
                                     oversample,
                                     &max_samples))
     timebase++;
+
+    time_multiplier = adc_multipliers(time_units);
 
     while ( sem_trywait(&thread_stop) )
     {
@@ -467,7 +472,7 @@ void Acquisition2000::collect_block_triggered (void)
                     values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
                     // TODO time will be probably wrong here, need to guess how to convert time range to time step...
                     //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
-                    time[count] = count * 0.01 * time_per_division_m;
+                    time[count] = count * time_multiplier * time_interval;
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
                     // 500 points are making a screen:
                     if(count == 500)
