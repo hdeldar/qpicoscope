@@ -290,7 +290,6 @@ void Acquisition3000::set_trigger_advanced(void)
 void Acquisition3000::collect_block_immediate (void)
 {
     int i = 0;
-    int count = 0;
     long     time_interval;
     short     time_units;
     short     oversample;
@@ -358,27 +357,19 @@ void Acquisition3000::collect_block_immediate (void)
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
-
-                for (  i = 0; i < no_of_samples; i++, count++ )
+                for (  i = 0; i < no_of_samples; i++ )
                 {
-                    values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    // TODO time will be probably wrong here, need to guess how to convert time range to time step...
-                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
-                    time[count] = count * time_interval * time_multiplier;
-                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
-                    // 500 points are making a screen:
-                    if(count == 500)
-                    {
-                        draw->setData(ch+1, time, values_V, count);
-                        count = 0;
-                        memset(time, 0, BUFFER_SIZE * sizeof(double));
-                        memset(values_V, 0, BUFFER_SIZE * sizeof(double));
+                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    time[i] = i * time_interval * time_multiplier;
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
+                    if(time[i] > 5 * time_per_division_m)
                         break;
-                    }
                 }
+                draw->setData(ch+1, time, values_V, i);
+                memset(time, 0, BUFFER_SIZE * sizeof(double));
+                memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
         }
-        Sleep(100);
     }
 }
 
@@ -391,7 +382,6 @@ void Acquisition3000::collect_block_immediate (void)
 void Acquisition3000::collect_block_triggered (void)
 {
     int i = 0;
-    int count = 0;
     long time_interval;
     short time_units;
     short oversample;
@@ -478,26 +468,19 @@ void Acquisition3000::collect_block_triggered (void)
             if (unitOpened_m.channelSettings[ch].enabled)
             {
 
-                for (  i = 0; i < no_of_samples; i++, count++ )
+                for (  i = 0; i < no_of_samples; i++ )
                 {
-                    values_V[count] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    // TODO time will be probably wrong here, need to guess how to convert time range to time step...
-                    //time[i] = ( i ? time[i-1] : 0) + unitOpened_m.channelSettings[ch].range
-                    time[count] = count * time_multiplier * time_interval;
-                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[count], unitOpened_m.channelSettings[ch].range, time[count]);
-                    // 500 points are making a screen:
-                    if(count == 500)
-                    {
-                        draw->setData(ch+1, time, values_V, count);
-                        count = 0;
-                        memset(time, 0, BUFFER_SIZE * sizeof(double));
-                        memset(values_V, 0, BUFFER_SIZE * sizeof(double));
+                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    time[i] = i * time_interval * time_multiplier;
+                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
+                    if(time[i] > 5 * time_per_division_m)
                         break;
-                    }
                 }
+                draw->setData(ch+1, time, values_V, i);
+                memset(time, 0, BUFFER_SIZE * sizeof(double));
+                memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
         }
-        Sleep(100);
     }
 }
 

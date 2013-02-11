@@ -243,6 +243,7 @@ void FrontPanel::create_menu_items()
 
     /* create time items */
     time_items = new std::vector<time_item_t>();
+#if 0
     new_time_item.name = "50ns/div";
     new_time_item.value = 0.00000005;
     time_items->push_back(new_time_item);
@@ -282,6 +283,7 @@ void FrontPanel::create_menu_items()
     new_time_item.name = "500µs/div";
     new_time_item.value = 0.0005;
     time_items->push_back(new_time_item);
+#endif
     new_time_item.name = "1ms/div";
     new_time_item.value = 0.001;
     time_items->push_back(new_time_item);
