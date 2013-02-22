@@ -207,7 +207,7 @@ private:
     void set_defaults (void);
     void set_trigger_advanced(void);
     void collect_block_immediate (void);
-    void collect_block_triggered (void);
+    void collect_block_triggered (trigger_e trigger_slope, double trigger_level);
     void collect_block_advanced_triggered ();
     void collect_block_ets (void);
     void collect_streaming (void);

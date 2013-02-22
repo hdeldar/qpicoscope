@@ -109,12 +109,18 @@ public:
      * @param[in] : the channel index (0 for channel A, 1 for channel B, etc)
      * @param[in] : volts per division caliber
      */
-     virtual void set_voltages (channel_e channel_index, double volts_per_division) = 0;
+    virtual void set_voltages (channel_e channel_index, double volts_per_division) = 0;
     /**
      * @brief set input time base
      * @param[in] : time per division valiber
      */
     virtual void set_timebase (double time_per_division) = 0;
+    /**
+     * @brief set input trigger type
+     * @param[in] : trigger slope, or AUTO
+     * @param[in] : trigger level
+     */
+    void set_trigger (trigger_e trigger_slope, double trigger_level);
     /**
      * @brief set signal generator (2200 series only) 
      * @param[in] : waveform type 
@@ -157,7 +163,7 @@ protected:
     virtual void set_defaults (void) = 0;
     virtual void set_trigger_advanced(void) = 0;
     virtual void collect_block_immediate (void) = 0;
-    virtual void collect_block_triggered (void) = 0;
+    virtual void collect_block_triggered (trigger_e trigger_slope, double trigger_level) = 0;
     virtual void collect_block_advanced_triggered (void) = 0;
     virtual void collect_block_ets (void) = 0;
     virtual void collect_streaming (void) = 0;
@@ -169,6 +175,8 @@ protected:
 
     sem_t thread_stop;
     DrawData *draw;
+    trigger_e trigger_slope_m;
+    double trigger_level_m;
 private:
     /**
      * @brief private typedef declarations

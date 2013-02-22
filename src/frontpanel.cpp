@@ -67,6 +67,9 @@ FrontPanel::FrontPanel(QWidget *parent)
     time_items = NULL;
     trigger_items = NULL;
 
+    /* initialize spinbox */
+    trigger_value = NULL;
+
     /* create the oscilloscope screen */
     screen = new Screen();
 
@@ -148,6 +151,13 @@ FrontPanel::FrontPanel(QWidget *parent)
     // set screen values
     setTriggerChanged(0);
 
+    trigger_value = new QDoubleSpinBox;
+    trigger_value->setRange(-5.0, 5.0);
+    trigger_value->setSingleStep(0.01);
+    trigger_value->setValue(0.0);
+    trigger_value->hide();
+    leftLayout->addWidget(trigger_value);
+
     screenBox->setFrameStyle(QFrame::WinPanel | QFrame::Sunken);
 
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
@@ -194,6 +204,8 @@ FrontPanel::~FrontPanel()
         delete time_items;
     if( NULL != trigger_items )
         delete trigger_items;
+    if( NULL != trigger_value )
+        delete trigger_value;
 
     /* delete acquisition */
     if(NULL != acquisition)
@@ -353,12 +365,12 @@ void FrontPanel::create_menu_items()
     new_trigger_item.name = "Auto";
     new_trigger_item.value = E_TRIGGER_AUTO;
     trigger_items->push_back(new_trigger_item);
-    //TODO new_trigger_item.name = "Rising";
-    //TODO new_trigger_item.value = E_TRIGGER_RISING;
-    //TODO trigger_items->push_back(new_trigger_item);
-    //TODO new_trigger_item.name = "Falling";
-    //TODO new_trigger_item.value = E_TRIGGER_FALLING;
-    //trigger_items->push_back(new_trigger_item);
+    new_trigger_item.name = "Rising";
+    new_trigger_item.value = E_TRIGGER_RISING;
+    trigger_items->push_back(new_trigger_item);
+    new_trigger_item.name = "Falling";
+    new_trigger_item.value = E_TRIGGER_FALLING;
+    trigger_items->push_back(new_trigger_item);
 
 }
 
@@ -411,5 +423,13 @@ void FrontPanel::setTriggerChanged(int comboIndex)
     DEBUG("Combo index %d\n", comboIndex);
     screen->setTrigger((trigger_items->at(comboIndex)).value);
     // TODO set acquisition accordingly
+   if(((trigger_items->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value->isHidden() == false))
+   {
+       trigger_value->hide();
+   }
+   else if(((trigger_items->at(comboIndex)).value != E_TRIGGER_AUTO) && (trigger_value->isHidden() == true))
+   {
+       trigger_value->show();
+   }
 }
 

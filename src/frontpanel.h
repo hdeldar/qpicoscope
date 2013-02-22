@@ -99,6 +99,7 @@ private:
         trigger_e value;
     }trigger_item_t;
     std::vector<trigger_item_t> *trigger_items;
+    QDoubleSpinBox *trigger_value;
 
 };
 
