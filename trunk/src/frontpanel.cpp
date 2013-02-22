@@ -432,6 +432,9 @@ void FrontPanel::setTriggerChanged(int comboIndex)
     {
         acquisition->stop();
         acquisition->set_trigger((trigger_items->at(comboIndex)).value, trigger_value->value());
+        /* If Auto trigger is set, hide trigger input 
+         * and if not set, show trigger input dialog.
+         */
         if(((trigger_items->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value->isHidden() == false))
         {
             trigger_value->hide();

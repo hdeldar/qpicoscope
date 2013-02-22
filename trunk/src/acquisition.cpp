@@ -204,7 +204,14 @@ void* Acquisition::threadAcquisition(void* arg)
     (void)arg;
     if ( NULL != acquisition )
     {
-         //acquisition->collect_streaming();
+         /* 
+          * May not be supported by all devices... 
+          * acquisition->collect_streaming();
+          */
+
+         /*
+          * Acquisition might be triggered or not...
+          */
          if(acquisition->trigger_slope_m == E_TRIGGER_AUTO)
          {
              acquisition->collect_block_immediate();

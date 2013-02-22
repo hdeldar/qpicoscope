@@ -26,17 +26,27 @@
  */
 
 #include <QApplication>
+#include <QPixmap>
 
 #include "mainwindow.h"
+#include "oscilloscope.h"
 
 /** @brief all programs have a start point... */
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    /* Setting pathes like that is horrible 
+     * For some reason QCoreApplication::applicationDirPath returns always "/" on my machine
+     */
+    QStringList icons_pathes;
+    icons_pathes << QCoreApplication::applicationDirPath() + "/images";
+    icons_pathes << "./images";
+    icons_pathes << "../images";
+    QDir::setSearchPaths("icons", icons_pathes);
     MainWindow mainwindow;
-    
-    
     mainwindow.setGeometry(100, 100, 800, 600);
     mainwindow.show();
+    mainwindow.setWindowIcon(QIcon("icons:icon50.png"));
+    mainwindow.setWindowTitle(QString("QPicoscope"));
     return app.exec();
 }
