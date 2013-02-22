@@ -30,6 +30,7 @@
 #define FRONTPANEL_H
 
 #include <QWidget>
+#include <QDoubleSpinBox>
 #include <string>
 #include <vector>
 

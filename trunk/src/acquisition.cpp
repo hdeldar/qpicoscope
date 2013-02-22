@@ -205,13 +205,13 @@ void* Acquisition::threadAcquisition(void* arg)
     if ( NULL != acquisition )
     {
          //acquisition->collect_streaming();
-         if(trigger_slope_m == E_TRIGGER_AUTO)
+         if(acquisition->trigger_slope_m == E_TRIGGER_AUTO)
          {
              acquisition->collect_block_immediate();
          }
          else
          {
-             acquisition->collect_block_triggered(trigger_slope_m, trigger_level_m);
+             acquisition->collect_block_triggered(acquisition->trigger_slope_m, acquisition->trigger_level_m);
          }
     }
     else
