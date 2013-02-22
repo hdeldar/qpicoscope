@@ -148,8 +148,6 @@ FrontPanel::FrontPanel(QWidget *parent)
     // connect trigger combo to the font panel
     connect(trigger, SIGNAL(valueChanged(int)), this, SLOT(setTriggerChanged(int)));
     leftLayout->addWidget(trigger);
-    // set screen values
-    setTriggerChanged(0);
 
     trigger_value = new QDoubleSpinBox;
     trigger_value->setRange(-5.0, 5.0);
@@ -157,6 +155,9 @@ FrontPanel::FrontPanel(QWidget *parent)
     trigger_value->setValue(0.0);
     trigger_value->hide();
     leftLayout->addWidget(trigger_value);
+
+    // set screen values
+    setTriggerChanged(0);
 
     screenBox->setFrameStyle(QFrame::WinPanel | QFrame::Sunken);
 
@@ -422,14 +423,24 @@ void FrontPanel::setTriggerChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
     screen->setTrigger((trigger_items->at(comboIndex)).value);
-    // TODO set acquisition accordingly
-   if(((trigger_items->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value->isHidden() == false))
-   {
-       trigger_value->hide();
-   }
-   else if(((trigger_items->at(comboIndex)).value != E_TRIGGER_AUTO) && (trigger_value->isHidden() == true))
-   {
-       trigger_value->show();
-   }
+    if( NULL == trigger_value )
+    {
+        ERROR("trigger_value is NULL.\n");
+        return;
+    }
+    if( NULL != acquisition )
+    {
+        acquisition->stop();
+        acquisition->set_trigger((trigger_items->at(comboIndex)).value, trigger_value->value());
+        if(((trigger_items->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value->isHidden() == false))
+        {
+            trigger_value->hide();
+        }
+        else if(((trigger_items->at(comboIndex)).value != E_TRIGGER_AUTO) && (trigger_value->isHidden() == true))
+        {
+            trigger_value->show();
+        }
+        acquisition->start();
+    }
 }
 
