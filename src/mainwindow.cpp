@@ -28,23 +28,11 @@
 
 MainWindow::MainWindow()
 {
-    frontpanel_m = new FrontPanel(this);    
-    setCentralWidget(frontpanel_m);
 
-    
     createActions();
     createMenus();
-
-    /* QToolBar example */
-    /*QToolBar* fileToolBar = addToolBar(tr("File"));
-    fileToolBar->addAction(aboutAct_m);*/
-
-    /* QDockWidget example */
-    /*QDockWidget *dockWidget = new QDockWidget(tr("Dock Widget"), this);
-    dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                Qt::RightDockWidgetArea);
-    //dockWidget->setWidget(dockWidgetContents);
-    addDockWidget(Qt::LeftDockWidgetArea, dockWidget);*/
+    frontpanel_m = new FrontPanel(this);    
+    setCentralWidget(frontpanel_m);
 }
 
 MainWindow::~MainWindow()
