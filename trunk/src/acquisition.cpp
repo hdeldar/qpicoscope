@@ -49,6 +49,9 @@ Acquisition::Acquisition()
 {
     DEBUG( "Acquisition model construction...\n");
     thread_id = 0;
+    trigger_slope_m = E_TRIGGER_AUTO;
+    trigger_level_m = 0.;
+
 }
 
 /****************************************************************************
@@ -202,8 +205,14 @@ void* Acquisition::threadAcquisition(void* arg)
     if ( NULL != acquisition )
     {
          //acquisition->collect_streaming();
-         acquisition->collect_block_immediate();
-         //acquisition->collect_block_triggered();
+         if(trigger_slope_m == E_TRIGGER_AUTO)
+         {
+             acquisition->collect_block_immediate();
+         }
+         else
+         {
+             acquisition->collect_block_triggered(trigger_slope_m, trigger_level_m);
+         }
     }
     else
     {
@@ -213,3 +222,11 @@ void* Acquisition::threadAcquisition(void* arg)
    pthread_exit(NULL); 
 }
 
+/****************************************************************************
+ * set trigger
+ ****************************************************************************/
+void Acquisition::set_trigger (trigger_e trigger_slope, double trigger_level)
+{
+   trigger_slope_m = trigger_slope;
+   trigger_level_m = trigger_level;
+}

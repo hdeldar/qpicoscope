@@ -367,23 +367,22 @@ void Acquisition2000::collect_block_immediate (void)
  *  unit, when a trigger event occurs.
  ****************************************************************************/
 
-void Acquisition2000::collect_block_triggered (void)
+void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double trigger_level)
 {
     int i = 0;
-  long     time_interval;
-  short     time_units;
-  short     oversample;
-  int     no_of_samples = BUFFER_SIZE;
-  short     auto_trigger_ms = 0;
-  long     time_indisposed_ms;
-  short     overflow;
-  int     threshold_mv =1500;
-  long     max_samples;
+    long     time_interval;
+    short     time_units;
+    short     oversample;
+    int     no_of_samples = BUFFER_SIZE;
+    short     auto_trigger_ms = 0;
+    long     time_indisposed_ms;
+    short     overflow;
+    int     threshold_mv = (int)(trigger_level * 1000);
+    long     max_samples;
     short ch;
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     double time_multiplier = 0.;
-
     DEBUG ( "Collect block triggered...\n" );
     DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
 
@@ -396,7 +395,16 @@ void Acquisition2000::collect_block_triggered (void)
    * 10% pre-trigger  (negative is pre-, positive is post-)
    */
     unitOpened_m.trigger.simple.channel = PS2000_CHANNEL_A;
-    unitOpened_m.trigger.simple.direction = (short) PS2000_RISING;
+    switch(trigger_slope)
+    {
+        case E_TRIGGER_FALLING:
+            unitOpened_m.trigger.simple.direction = (short) PS2000_FALLING;
+        break;
+        case E_TRIGGER_RISING:
+        default:
+            unitOpened_m.trigger.simple.direction = (short) PS2000_RISING;
+        break;
+    }
     unitOpened_m.trigger.simple.threshold = 100.f;
     unitOpened_m.trigger.simple.delay = -10;
 
