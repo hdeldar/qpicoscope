@@ -102,8 +102,12 @@ FrontPanel::FrontPanel(QWidget *parent)
         connect(volt_channel_A, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
         leftLayout->addWidget(volt_channel_A);
         // set screen values
-        if(NULL != acquisition)
-            acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->at(0)).value);
+        if(NULL != acquisition && NULL != screen)
+        {
+            screen->setVoltCaliber((volt_items->back()).value);
+            acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->back()).value);
+            volt_channel_A->setCurrentIndex(volt_items->size() - 1);
+        }
         
     }
 
@@ -118,7 +122,10 @@ FrontPanel::FrontPanel(QWidget *parent)
         leftLayout->addWidget(volt_channel_B);
         // set screen values
         if(NULL != acquisition)
-            acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->at(0)).value);
+        {
+            acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->back()).value);
+            volt_channel_B->setCurrentIndex(volt_items->size() - 1);
+        }
     }
 
     time = new ComboRange(tr("TIME/DIV"));
@@ -129,8 +136,12 @@ FrontPanel::FrontPanel(QWidget *parent)
     connect(time, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
     leftLayout->addWidget(time);
     // set screen values
-    if(NULL != acquisition)
-        acquisition->set_timebase((time_items->at(0)).value);
+    if(NULL != acquisition && NULL != screen)
+    {
+        acquisition->set_timebase((time_items->back()).value);
+        screen->setTimeCaliber((time_items->back()).value);
+        time->setCurrentIndex(time_items->size() - 1);
+    }
 
     current = new ComboRange(tr("CURRENT"));
     for(uint32_t i = 0; i < current_items->size(); i++)
