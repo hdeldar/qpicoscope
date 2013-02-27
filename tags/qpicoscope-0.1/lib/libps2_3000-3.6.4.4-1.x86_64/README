@@ -1,0 +1,46 @@
+****************************************************************************
+*                  PicoScope 2000/3000 Linux Driver                        *
+*                         Pico Technology                                  *
+****************************************************************************
+
+1. What files are included in this documentation?
+	- INSTALL: explains how to install the driver on your Linux system.
+
+	- 95-pico.rules: an example showing how to set access permission for 
+           USB devices on Linux systems using udev.
+
+	- usbtest: a script to help you check whether the current user of 
+           the system has permission to access the USB devices.
+
+	- PS2000con.c: an example program demonstrating the use of the
+           PicoScope 2000 driver.
+
+	- PS3000con.c: an example program demonstrating the use of the
+           PicoScope 3000 driver.
+
+2. How do I install this driver?
+	Please refer to the file INSTALL included in this documentation.
+
+3. How do I use the example programs?
+	- Firstly install the driver as described in INSTALL.
+	- Then compile the example program, linking against the right
+	  library:
+	    For PS2000:  gcc -lps2000 PS2000con.c -oPS2000con
+	    For PS3000:  gcc -lps3000 PS3000con.c -oPS3000con
+	- Plug-in the unit.
+	- Start the program:
+	    ./PS2000con     or     ./PS3000con
+
+4. What is usbtest for and how do I use it?
+	If you are unable to access your PicoScope, a possible cause is that
+	the relevant permissions are not set correctly on your Linux system.
+	usbtest is a shell script which helps you diagnose such problems.
+
+	- Type "./usbtest" in the shell to run it. 
+        - Follow the on-screen instructions, including plugging in your 
+	  PicoScope when requested.
+	- The program will report whether the current user has permission 
+	  to access usb devices. If they do not, some help has been included 
+          in INSTALL. Alternatively, please consult your Linux documentation
+	  or, if you do not administer the system yourself, please contact
+	  your system administrator.
