@@ -289,19 +289,20 @@ void Acquisition3000::set_trigger_advanced(void)
  ****************************************************************************/
 void Acquisition3000::collect_block_immediate (void)
 {
-    int i = 0;
-    long     time_interval;
-    short     time_units;
-    short     oversample;
-    int     no_of_samples = BUFFER_SIZE;
-    short     auto_trigger_ms = 0;
-    long     time_indisposed_ms;
-    short     overflow;
-    long     max_samples;
+    int   i = 0;
+    long  time_interval;
+    short time_units;
+    short oversample;
+    int   no_of_samples = BUFFER_SIZE;
+    short auto_trigger_ms = 0;
+    long  time_indisposed_ms;
+    short overflow;
+    long  max_samples;
     short ch = 0;
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     double time_multiplier = 0.;
+    double time_offset[CHANNEL_MAX] = {0.};
 
     DEBUG ( "Collect block immediate...\n" );
 
@@ -325,7 +326,8 @@ void Acquisition3000::collect_block_immediate (void)
     timebase++;                                        ;
 
     time_multiplier = adc_multipliers(time_units);
-    DEBUG ( "timebase: %hd\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%f\n", timebase, oversample, time_units, time_interval, time_multiplier );
+    DEBUG ( "timebase: %hd\tnb_of_samples:%d\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%e\n", 
+             timebase, no_of_samples, oversample, time_units, time_interval, time_multiplier );
 
     while ( sem_trywait(&thread_stop) )
     {
@@ -360,12 +362,21 @@ void Acquisition3000::collect_block_immediate (void)
                 for (  i = 0; i < no_of_samples; i++ )
                 {
                     values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = i * time_interval * time_multiplier;
+                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
                     if(time[i] > 5 * time_per_division_m)
                         break;
                 }
                 draw->setData(ch+1, time, values_V, i);
+                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
+                if(time[i] > 5 * time_per_division_m)
+                {
+                    time_offset[ch] = 0.;
+                }
+                else
+                {
+                    time_offset[ch] = time[i];
+                }
                 memset(time, 0, BUFFER_SIZE * sizeof(double));
                 memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
@@ -395,6 +406,7 @@ void Acquisition3000::collect_block_triggered (trigger_e trigger_slope, double t
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     double time_multiplier = 0.;
+    double time_offset[CHANNEL_MAX] = {0.};
     DEBUG ( "Collect block triggered...\n" );
     DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
 
@@ -479,12 +491,21 @@ void Acquisition3000::collect_block_triggered (trigger_e trigger_slope, double t
                 for (  i = 0; i < no_of_samples; i++ )
                 {
                     values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = i * time_interval * time_multiplier;
+                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
                     if(time[i] > 5 * time_per_division_m)
                         break;
                 }
                 draw->setData(ch+1, time, values_V, i);
+                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
+                if(time[i] > 5 * time_per_division_m)
+                {
+                    time_offset[ch] = 0.;
+                }
+                else
+                {
+                    time_offset[ch] = time[i];
+                }
                 memset(time, 0, BUFFER_SIZE * sizeof(double));
                 memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
@@ -1341,6 +1362,8 @@ void Acquisition3000::set_sig_gen_arb (long int frequency)
 
 
     delta = ((frequency * waveformSize) / 4096) * 4294967296.0 * 20e-9;
+    //TODO handle generator
+    (void)delta; // avoid warning while generator si not implemented
     //ps3000_set_siggen(unitOpened_m.handle, 0, 3000000, (unsigned long)delta, (unsigned long)delta, 0, 0, arbitraryWaveform, waveformSize, PS3000_UP, 0);
 }
 
@@ -1357,7 +1380,7 @@ void Acquisition3000::set_timebase (double time_per_division)
   short  oversample = 1;
   long   max_samples = 0;
 
-  DEBUG ( "Specify timebase\n" );
+  DEBUG ( "Specified timebase : %f\n", time_per_division );
   time_per_division_m = time_per_division;
   
   /* See what ranges are available...
@@ -1415,10 +1438,15 @@ void Acquisition3000::set_timebase (double time_per_division)
       if ( time_interval > 0 )
       {
           DEBUG ( "%d -> %ld %s  %hd\n", i, time_interval, adc_units(time_units), time_units );
-          if((time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
+          /**
+           * we want 100 points per division.
+           * Screen has 5 time divisions.
+           * So we want 500 points
+           */
+          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
               timebase = i;
           }
-          else if((time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
+          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
               break;
           }
       }

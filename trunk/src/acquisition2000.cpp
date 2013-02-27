@@ -290,6 +290,7 @@ void Acquisition2000::collect_block_immediate (void)
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     double time_multiplier = 0.;
+    double time_offset[CHANNEL_MAX] = {0.};
 
     DEBUG ( "Collect block immediate...\n" );
 
@@ -348,12 +349,21 @@ void Acquisition2000::collect_block_immediate (void)
                 for (  i = 0; i < no_of_samples; i++ )
                 {
                     values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = i * time_interval * time_multiplier;
+                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
                     if(time[i] > 5 * time_per_division_m)
                         break;
                 }
                 draw->setData(ch+1, time, values_V, i);
+                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
+                if(time[i] > 5 * time_per_division_m)
+                {
+                    time_offset[ch] = 0.;
+                }
+                else
+                {
+                    time_offset[ch] = time[i];
+                }
                 memset(time, 0, BUFFER_SIZE * sizeof(double));
                 memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
@@ -383,6 +393,7 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
     double values_V[BUFFER_SIZE] = {0};
     double time[BUFFER_SIZE] = {0};
     double time_multiplier = 0.;
+    double time_offset[CHANNEL_MAX] = {0.};
     DEBUG ( "Collect block triggered...\n" );
     DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
 
@@ -468,12 +479,21 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
                 for (  i = 0; i < no_of_samples; i++ )
                 {
                     values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = i * time_interval * time_multiplier;
+                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
                     DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
                     if(time[i] > 5 * time_per_division_m)
                         break;
                 }
                 draw->setData(ch+1, time, values_V, i);
+                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
+                if(time[i] > 5 * time_per_division_m)
+                {
+                    time_offset[ch] = 0.;
+                }
+                else
+                {
+                    time_offset[ch] = time[i];
+                }
                 memset(time, 0, BUFFER_SIZE * sizeof(double));
                 memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }

@@ -84,6 +84,11 @@ public:
     void setValues(const QStringList & list);
 
 public slots:
+    /**
+     * @brief set ComboBox current index
+     * @param[in]: the index to set
+     */
+    void setCurrentIndex (int index);
 
 
 signals:

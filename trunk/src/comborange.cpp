@@ -93,3 +93,8 @@ void ComboRange::setText(const QString &text)
 {
     label->setText(text);
 }
+
+void ComboRange::setCurrentIndex(int index)
+{
+    combo->setCurrentIndex(index);
+}

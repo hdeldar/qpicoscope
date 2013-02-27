@@ -56,7 +56,7 @@
                              "If not, see <a href='http://www.gnu.org/licenses'>http://www.gnu.org/licenses</a>.<br></p>"
 
 
-#define CREDITS_QPICOSCOPE   "<p align='justify'>QPicoscope si using:<br>"\
+#define CREDITS_QPICOSCOPE   "<p align='justify'>QPicoscope is using:<br>"\
                              "- Qt. Copyright (C) 2012 Nokia Corporation and/or its subsidiary(-ies).<br>"\
                              "  Qt is a Nokia product. See qt.nokia.com for more information.<br>"\
                              "- Qwt. Copyright (C) 1997 Josef Wilgen; Copyright (C) 2002 Uwe Rathmann.<br>"\
