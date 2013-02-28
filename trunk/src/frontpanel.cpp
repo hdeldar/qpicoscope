@@ -138,9 +138,9 @@ FrontPanel::FrontPanel(QWidget *parent)
     // set screen values
     if(NULL != acquisition && NULL != screen)
     {
-        acquisition->set_timebase((time_items->back()).value);
-        screen->setTimeCaliber((time_items->back()).value);
-        time->setCurrentIndex(time_items->size() - 1);
+        acquisition->set_timebase((time_items->at(0)).value);
+        screen->setTimeCaliber((time_items->at(0)).value);
+        time->setCurrentIndex(0);
     }
 
     current = new ComboRange(tr("CURRENT"));
