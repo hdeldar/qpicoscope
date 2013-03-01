@@ -282,15 +282,17 @@ void Acquisition2000::collect_block_immediate (void)
     short     time_units;
     short     oversample;
     int     no_of_samples = BUFFER_SIZE;
+    int nb_of_samples_in_screen = 0;
     short     auto_trigger_ms = 0;
     long     time_indisposed_ms;
     short     overflow;
     long     max_samples;
     short ch = 0;
-    double values_V[BUFFER_SIZE] = {0};
-    double time[BUFFER_SIZE] = {0};
+    double* values_V[CHANNEL_MAX] = {NULL};
+    double* time[CHANNEL_MAX] = {NULL};
     double time_multiplier = 0.;
     double time_offset[CHANNEL_MAX] = {0.};
+    int index[CHANNEL_MAX] = {0};
 
     DEBUG ( "Collect block immediate...\n" );
 
@@ -314,7 +316,19 @@ void Acquisition2000::collect_block_immediate (void)
     timebase++;                                        ;
 
     time_multiplier = adc_multipliers(time_units);
-    DEBUG ( "timebase: %hd\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%f\n", timebase, oversample, time_units, time_interval, time_multiplier );
+    nb_of_samples_in_screen = (int)(5 * time_per_division_m / (time_interval * time_multiplier)) + 1;
+    nb_of_samples_in_screen = ( nb_of_samples_in_screen < BUFFER_SIZE ? BUFFER_SIZE : nb_of_samples_in_screen);
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        if (unitOpened_m.channelSettings[ch].enabled)
+        {
+            values_V[ch] = (double*)malloc(nb_of_samples_in_screen * sizeof(double));
+            time[ch] = (double*)malloc(nb_of_samples_in_screen * sizeof(double));
+        }
+    }
+    DEBUG ( "timebase: %hd\tnb_of_samples:%d\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%e\tnb_of_samples_in_screen:%d\n", 
+             timebase, no_of_samples, oversample, time_units, time_interval, time_multiplier, nb_of_samples_in_screen );
+
 
     while ( sem_trywait(&thread_stop) )
     {
@@ -324,6 +338,12 @@ void Acquisition2000::collect_block_immediate (void)
         ps2000_run_block ( unitOpened_m.handle, no_of_samples, timebase, oversample, &time_indisposed_ms );
         while ( !ps2000_ready ( unitOpened_m.handle ) )
         {
+            if( !sem_trywait(&thread_stop) )
+            {
+                /* re-post semaphore to exit the main loop */
+                sem_post(&thread_stop);
+                break;
+            }
             Sleep ( 100 );
         }
 
@@ -346,27 +366,35 @@ void Acquisition2000::collect_block_immediate (void)
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
-                for (  i = 0; i < no_of_samples; i++ )
+                for (  i = 0; (i < no_of_samples) && (index[ch] < nb_of_samples_in_screen) ; i++, index[ch]++ )
                 {
-                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
-                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
-                    if(time[i] > 5 * time_per_division_m)
-                        break;
+                    values_V[ch][index[ch]] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    time[ch][index[ch]] = (times[i] * time_multiplier) + time_offset[ch];
+                    //DEBUG("V: %lf (range %d) T: %lf\n", values_V[index[ch]], unitOpened_m.channelSettings[ch].range, time[index[ch]]);
                 }
-                draw->setData(ch+1, time, values_V, i);
-                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
-                if(time[i] > 5 * time_per_division_m)
+                // resetting all available data as long as the screen is not filled.
+                draw->setData(ch+1, time[ch], values_V[ch], index[ch]);
+                DEBUG("set %d data\n", index[ch]);
+                if( (index[ch] >= nb_of_samples_in_screen) || (time[ch][index[ch] - 1] > 5 * time_per_division_m) )
                 {
                     time_offset[ch] = 0.;
+                    memset(time[ch], 0, nb_of_samples_in_screen * sizeof(double));
+                    memset(values_V[ch], 0, nb_of_samples_in_screen * sizeof(double));
+                    index[ch] = 0;
                 }
                 else
                 {
-                    time_offset[ch] = time[i];
+                    time_offset[ch] = time[ch][index[ch] - 1];
                 }
-                memset(time, 0, BUFFER_SIZE * sizeof(double));
-                memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
+        }
+    }
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        if (unitOpened_m.channelSettings[ch].enabled)
+        {
+            delete values_V[ch];
+            delete time[ch];
         }
     }
 }
@@ -384,16 +412,18 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
     short     time_units;
     short     oversample;
     int     no_of_samples = BUFFER_SIZE;
+    int nb_of_samples_in_screen = 0;
     short     auto_trigger_ms = 0;
     long     time_indisposed_ms;
     short     overflow;
     int     threshold_mv = (int)(trigger_level * 1000);
-    long     max_samples;
-    short ch;
-    double values_V[BUFFER_SIZE] = {0};
-    double time[BUFFER_SIZE] = {0};
+    long max_samples;
+    short ch = 0;
+    double* values_V[CHANNEL_MAX] = {NULL};
+    double* time[CHANNEL_MAX] = {NULL};
     double time_multiplier = 0.;
     double time_offset[CHANNEL_MAX] = {0.};
+    int index[CHANNEL_MAX] = {0};
     DEBUG ( "Collect block triggered...\n" );
     DEBUG ( "Collects when value rises past %dmV\n", threshold_mv );
 
@@ -441,6 +471,18 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
     timebase++;
 
     time_multiplier = adc_multipliers(time_units);
+    nb_of_samples_in_screen = (int)(5 * time_per_division_m / (time_interval * time_multiplier)) + 1;
+    nb_of_samples_in_screen = ( nb_of_samples_in_screen < BUFFER_SIZE ? BUFFER_SIZE : nb_of_samples_in_screen);
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        if (unitOpened_m.channelSettings[ch].enabled)
+        {
+            values_V[ch] = (double*)malloc(nb_of_samples_in_screen * sizeof(double));
+            time[ch] = (double*)malloc(nb_of_samples_in_screen * sizeof(double));
+        }
+    }
+    DEBUG ( "timebase: %hd\tnb_of_samples:%d\toversample:%hd\ttime_units:%hd\ttime_interval:%lu\ttime_multiplier:%e\tnb_of_samples_in_screen:%d\n", 
+             timebase, no_of_samples, oversample, time_units, time_interval, time_multiplier, nb_of_samples_in_screen );
 
     while ( sem_trywait(&thread_stop) )
     {
@@ -451,6 +493,12 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
 
         while ( !ps2000_ready ( unitOpened_m.handle ))
         {
+            if( !sem_trywait(&thread_stop) )
+            {
+                /* re-post semaphore to exit the main loop */
+                sem_post(&thread_stop);
+                break;
+            }
             Sleep ( 100 );
         }
 
@@ -475,28 +523,37 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
         {
             if (unitOpened_m.channelSettings[ch].enabled)
             {
-
-                for (  i = 0; i < no_of_samples; i++ )
+                for (  i = 0; (i < no_of_samples) && (index[ch] < nb_of_samples_in_screen) ; i++, index[ch]++ )
                 {
-                    values_V[i] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
-                    time[i] = (times[i] * time_multiplier) + time_offset[ch];
-                    DEBUG("V: %lf (range %d) T: %lf\n", values_V[i], unitOpened_m.channelSettings[ch].range, time[i]);
-                    if(time[i] > 5 * time_per_division_m)
-                        break;
+                    values_V[ch][index[ch]] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    time[ch][index[ch]] = (times[i] * time_multiplier) + time_offset[ch];
+                    //DEBUG("V: %lf (range %d) T: %lf\n", values_V[index[ch]], unitOpened_m.channelSettings[ch].range, time[index[ch]]);
                 }
-                draw->setData(ch+1, time, values_V, i);
-                i = ( i >= no_of_samples ? (no_of_samples - 1) : i );
-                if(time[i] > 5 * time_per_division_m)
+                // resetting all available data as long as the screen is not filled.
+                draw->setData(ch+1, time[ch], values_V[ch], index[ch]);
+                DEBUG("set %d data\n", index[ch]);
+                if( (index[ch] >= nb_of_samples_in_screen) || (time[ch][index[ch] - 1] > 5 * time_per_division_m) )
                 {
                     time_offset[ch] = 0.;
+                    memset(time[ch], 0, nb_of_samples_in_screen * sizeof(double));
+                    memset(values_V[ch], 0, nb_of_samples_in_screen * sizeof(double));
+                    index[ch] = 0;
                 }
                 else
                 {
-                    time_offset[ch] = time[i];
+                    time_offset[ch] = time[ch][index[ch] - 1];
                 }
-                memset(time, 0, BUFFER_SIZE * sizeof(double));
-                memset(values_V, 0, BUFFER_SIZE * sizeof(double));
             }
+
+        }
+    }
+
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        if (unitOpened_m.channelSettings[ch].enabled)
+        {
+            delete values_V[ch];
+            delete time[ch];
         }
     }
 }
@@ -1366,10 +1423,15 @@ void Acquisition2000::set_timebase (double time_per_division)
       if ( time_interval > 0 )
       {
           DEBUG ( "%d -> %ld %s  %hd\n", i, time_interval, adc_units(time_units), time_units );
-          if((time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
+          /**
+           * we want 100 points per division.
+           * Screen has 5 time divisions.
+           * So we want 500 points
+           */
+          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
               timebase = i;
           }
-          else if((time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
+          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
               break;
           }
       }
@@ -1387,6 +1449,8 @@ void Acquisition2000::set_timebase (double time_per_division)
 void Acquisition2000::set_voltages (channel_e channel_index, double volts_per_division)
 {
     uint8_t i = 0;
+
+    DEBUG("channel index %d, volts/div %lf\n", channel_index, volts_per_division);
 
     if (channel_index >= unitOpened_m.noOfChannels || channel_index >=CHANNEL_MAX)
     {
