@@ -97,10 +97,6 @@ FrontPanel::FrontPanel(QWidget *parent)
         volt_channel_A = new ComboRange(tr("VOLT/DIV CH. A"));
         for(uint32_t i = 0; i < volt_items->size(); i++)
             volt_channel_A->setValue(i, (volt_items->at(i)).name.c_str());
-        // connect volt combo to the font panel
-        // front panel will then set screen values
-        connect(volt_channel_A, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
-        leftLayout->addWidget(volt_channel_A);
         // set screen values
         if(NULL != acquisition && NULL != screen)
         {
@@ -108,6 +104,10 @@ FrontPanel::FrontPanel(QWidget *parent)
             acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->back()).value);
             volt_channel_A->setCurrentIndex(volt_items->size() - 1);
         }
+        // connect volt combo to the font panel
+        // front panel will then set screen values
+        connect(volt_channel_A, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
+        leftLayout->addWidget(volt_channel_A);
         
     }
 
@@ -116,25 +116,21 @@ FrontPanel::FrontPanel(QWidget *parent)
         volt_channel_B = new ComboRange(tr("VOLT/DIV CH. B"));
         for(uint32_t i = 0; i < volt_items->size(); i++)
             volt_channel_B->setValue(i, (volt_items->at(i)).name.c_str());
-        // connect volt combo to the font panel
-        // front panel will then set screen values
-        connect(volt_channel_B, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
-        leftLayout->addWidget(volt_channel_B);
         // set screen values
         if(NULL != acquisition)
         {
             acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->back()).value);
             volt_channel_B->setCurrentIndex(volt_items->size() - 1);
         }
+        // connect volt combo to the font panel
+        // front panel will then set screen values
+        connect(volt_channel_B, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
+        leftLayout->addWidget(volt_channel_B);
     }
 
     time = new ComboRange(tr("TIME/DIV"));
     for(uint32_t i = 0; i < time_items->size(); i++)
         time->setValue(i, (time_items->at(i)).name.c_str());
-    // connect time combo to the font panel
-    // front panel will then set screen values
-    connect(time, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
-    leftLayout->addWidget(time);
     // set screen values
     if(NULL != acquisition && NULL != screen)
     {
@@ -142,6 +138,10 @@ FrontPanel::FrontPanel(QWidget *parent)
         screen->setTimeCaliber((time_items->at(0)).value);
         time->setCurrentIndex(0);
     }
+    // connect time combo to the font panel
+    // front panel will then set screen values
+    connect(time, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
+    leftLayout->addWidget(time);
 
     current = new ComboRange(tr("CURRENT"));
     for(uint32_t i = 0; i < current_items->size(); i++)

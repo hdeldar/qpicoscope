@@ -97,6 +97,8 @@ public:
     {
         CHANNEL_A = 0,
         CHANNEL_B,
+        CHANNEL_C,
+        CHANNEL_D,
         CHANNEL_MAX
     }channel_e;
 
