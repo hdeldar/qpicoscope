@@ -94,6 +94,11 @@ public:
      */
     void set_timebase (double time_per_division);
     /**
+     * @brief set AC/DC
+     * @param[in] : a current_e value (0 = AC, 1 = DC)
+     */
+    void set_DC_coupled(current_e coupling);
+    /**
      * @brief set signal generator (2200 series only) 
      * @param[in] : waveform type 
      * @param[in] : frequency in Hertz

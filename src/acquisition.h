@@ -124,6 +124,11 @@ public:
      */
     void set_trigger (trigger_e trigger_slope, double trigger_level);
     /**
+     * @brief set AC/DC
+     * @param[in] : a current_e value (0 = AC, 1 = DC)
+     */
+    virtual void set_DC_coupled(current_e coupling) = 0;
+    /**
      * @brief set signal generator (2200 series only) 
      * @param[in] : waveform type 
      * @param[in] : frequency in Hertz

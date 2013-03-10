@@ -165,6 +165,7 @@ FrontPanel::FrontPanel(QWidget *parent)
     trigger_value->setSingleStep(0.01);
     trigger_value->setValue(0.0);
     trigger_value->hide();
+    connect(trigger_value, SIGNAL(valueChanged(double)), this, SLOT(setTriggerChanged(double)));
     leftLayout->addWidget(trigger_value);
 
     // set screen values
@@ -428,6 +429,12 @@ void FrontPanel::setCurrentChanged(int comboIndex)
     DEBUG("Combo index %d\n", comboIndex);
     screen->setCurrent((current_items->at(comboIndex)).value);
     // TODO set acquisition accordingly
+    if ( NULL != acquisition )
+    {
+        acquisition->stop();
+        acquisition->set_DC_coupled((current_items->at(comboIndex)).value);
+        acquisition->start();
+    }
 }
 
 void FrontPanel::setTriggerChanged(int comboIndex)
@@ -456,5 +463,11 @@ void FrontPanel::setTriggerChanged(int comboIndex)
         }
         acquisition->start();
     }
+}
+
+void FrontPanel::setTriggerChanged(double trigger_value)
+{
+    (void)trigger_value;
+    setTriggerChanged(trigger->value());
 }
 

@@ -1444,6 +1444,18 @@ void Acquisition2000::set_timebase (double time_per_division)
   }
 
 /****************************************************************************
+ * Select coupling for all channels
+ ****************************************************************************/
+void Acquisition2000::set_DC_coupled(current_e coupling)
+{
+    short ch = 0;
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        unitOpened_m.channelSettings[ch].DCcoupled = coupling;
+    }
+
+}
+/****************************************************************************
  * Select input voltage ranges for channels A and B
  ****************************************************************************/
 void Acquisition2000::set_voltages (channel_e channel_index, double volts_per_division)

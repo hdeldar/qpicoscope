@@ -381,6 +381,12 @@ void Acquisition3000::collect_block_immediate (void)
                 for (  i = 0; (i < no_of_samples) && (index[ch] < nb_of_samples_in_screen) ; i++, index[ch]++ )
                 {
                     values_V[ch][index[ch]] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+                    DEBUG("(times[%d] * time_multiplier): %lf;\t(%d * time_multiplier * time_interval): %lf\n", 
+                          i, 
+                          (times[i] * time_multiplier), 
+                          i, 
+                          (i * time_multiplier * time_interval)
+                         );
                     time[ch][index[ch]] = (times[i] * time_multiplier) + time_offset[ch];
                     //DEBUG("V: %lf (range %d) T: %lf\n", values_V[index[ch]], unitOpened_m.channelSettings[ch].range, time[index[ch]]);
                 }
@@ -1513,6 +1519,18 @@ void Acquisition3000::set_timebase (double time_per_division)
   DEBUG ( "Timebase %d - %ld %s\n", timebase, time_interval, adc_units(time_units) );
   }
 
+/****************************************************************************
+ * Select coupling for all channels
+ ****************************************************************************/
+void Acquisition3000::set_DC_coupled(current_e coupling)
+{
+    short ch = 0;
+    for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
+    {
+        unitOpened_m.channelSettings[ch].DCcoupled = coupling;
+    }
+
+}
 /****************************************************************************
  * Select input voltage ranges for channels A and B
  ****************************************************************************/
