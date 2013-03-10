@@ -59,6 +59,7 @@ protected slots:
     void setTimeChanged(int);
     void setCurrentChanged(int);
     void setTriggerChanged(int);
+    void setTriggerChanged(double);
 
 private:
     /** @brief create menu items */
