@@ -1431,10 +1431,10 @@ void Acquisition2000::set_timebase (double time_per_division)
            * Screen has 5 time divisions.
            * So we want 500 points
            */
-          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.050)){
+          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.010)){
               timebase = i;
           }
-          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.050)){
+          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.010)){
               break;
           }
       }
