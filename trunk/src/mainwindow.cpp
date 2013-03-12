@@ -50,7 +50,6 @@ void MainWindow::about()
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setText(tr(ABOUT_QPICOSCOPE));
     msgBox.show();
-    msgBox.move( win.width() / 2 - msgBox.width() / 2, win.height() / 2 - msgBox.height() / 2 );
     msgBox.exec();
 }
 
@@ -67,7 +66,6 @@ void MainWindow::credits()
     msgBox.setTextFormat(Qt::RichText);
     msgBox.setText(tr(CREDITS_QPICOSCOPE));
     msgBox.show();
-    msgBox.move( win.width() / 2 - msgBox.width() / 2, win.height() / 2 - msgBox.height() / 2 );
     msgBox.exec();
 }
 
