@@ -395,8 +395,8 @@ void Acquisition2000::collect_block_immediate (void)
     {
         if (unitOpened_m.channelSettings[ch].enabled)
         {
-            delete values_V[ch];
-            delete time[ch];
+            free(values_V[ch]);
+            free(time[ch]);
         }
     }
 }
@@ -514,8 +514,8 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
                                   times,
                                   unitOpened_m.channelSettings[PS2000_CHANNEL_A].values,
                                   unitOpened_m.channelSettings[PS2000_CHANNEL_B].values,
-                                  NULL,
-                                  NULL,
+                                  unitOpened_m.channelSettings[PS2000_CHANNEL_C].values,
+                                  unitOpened_m.channelSettings[PS2000_CHANNEL_D].values,
                                   &overflow, time_units, BUFFER_SIZE );
         DEBUG ("Time\tValue\n");
         DEBUG ("(ns)\t(%s)\n", adc_units (time_units));
@@ -555,8 +555,8 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
     {
         if (unitOpened_m.channelSettings[ch].enabled)
         {
-            delete values_V[ch];
-            delete time[ch];
+            free(values_V[ch]);
+            free(time[ch]);
         }
     }
 }

@@ -382,12 +382,14 @@ void Acquisition3000::collect_block_immediate (void)
                 for (  i = 0; (i < no_of_samples) && (index[ch] < nb_of_samples_in_screen) ; i++, index[ch]++ )
                 {
                     values_V[ch][index[ch]] = 0.001 * adc_to_mv(unitOpened_m.channelSettings[ch].values[i], unitOpened_m.channelSettings[ch].range);
+#if 0
                     DEBUG("(times[%d] * time_multiplier): %lf;\t(%d * time_multiplier * time_interval): %lf\n", 
                           i, 
                           (times[i] * time_multiplier), 
                           i, 
                           (i * time_multiplier * time_interval)
                          );
+#endif
                     time[ch][index[ch]] = (times[i] * time_multiplier) + time_offset[ch];
                     //DEBUG("V: %lf (range %d) T: %lf\n", values_V[index[ch]], unitOpened_m.channelSettings[ch].range, time[index[ch]]);
                 }
@@ -413,8 +415,8 @@ void Acquisition3000::collect_block_immediate (void)
     {
         if (unitOpened_m.channelSettings[ch].enabled)
         {
-            delete values_V[ch];
-            delete time[ch];
+            free(values_V[ch]);
+            free(time[ch]);
         }
     }
 }
@@ -571,8 +573,8 @@ void Acquisition3000::collect_block_triggered (trigger_e trigger_slope, double t
     {
         if (unitOpened_m.channelSettings[ch].enabled)
         {
-            delete values_V[ch];
-            delete time[ch];
+            free(values_V[ch]);
+            free(time[ch]);
         }
     }
 }
