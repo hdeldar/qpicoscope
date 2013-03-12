@@ -65,43 +65,43 @@ private:
     /** @brief create menu items */
     void create_menu_items();
     /** @brief screen of the front panel */
-    Screen *screen;
+    Screen *screen_m;
     /** @brief Acquisition engine of the oscilloscope */
-    Acquisition* acquisition;
+    Acquisition* acquisition_m;
     /** @brief voltage selection on the front panel */
-    ComboRange *volt_channel_A;
-    ComboRange *volt_channel_B;
+    ComboRange *volt_channel_A_m;
+    ComboRange *volt_channel_B_m;
     typedef struct
     {
         std::string name;
         double value;
     }volt_item_t;
-    std::vector<volt_item_t> *volt_items;
+    std::vector<volt_item_t> *volt_items_m;
     /** @brief timing selection on the front panel */
-    ComboRange *time;
+    ComboRange *time_m;
     typedef struct
     {
         std::string name;
         double value;
     }time_item_t;
-    std::vector<time_item_t> *time_items;
+    std::vector<time_item_t> *time_items_m;
     /** @brief current type selection on the front panel */
-    ComboRange *current;
+    ComboRange *current_m;
     typedef struct
     {
         std::string name;
         current_e value;
     }current_item_t;
-    std::vector<current_item_t> *current_items;
+    std::vector<current_item_t> *current_items_m;
     /** @brief trigger type selection on the front panel */
-    ComboRange *trigger;
+    ComboRange *trigger_m;
     typedef struct
     {
         std::string name;
         trigger_e value;
     }trigger_item_t;
-    std::vector<trigger_item_t> *trigger_items;
-    QDoubleSpinBox *trigger_value;
+    std::vector<trigger_item_t> *trigger_items_m;
+    QDoubleSpinBox *trigger_value_m;
 
 };
 

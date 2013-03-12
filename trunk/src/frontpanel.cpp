@@ -55,28 +55,28 @@ FrontPanel::FrontPanel(QWidget *parent)
     QGridLayout *gridLayout = new QGridLayout;
 
     /* initialize ComboRanges */
-    volt_channel_A = NULL;
-    volt_channel_B = NULL;
-    current = NULL;
-    time = NULL;
-    trigger = NULL;
+    volt_channel_A_m = NULL;
+    volt_channel_B_m = NULL;
+    current_m = NULL;
+    time_m = NULL;
+    trigger_m = NULL;
 
     /* initialize items */
-    volt_items = NULL;
-    current_items = NULL;
-    time_items = NULL;
-    trigger_items = NULL;
+    volt_items_m = NULL;
+    current_items_m = NULL;
+    time_items_m = NULL;
+    trigger_items_m = NULL;
 
     /* initialize spinbox */
-    trigger_value = NULL;
+    trigger_value_m = NULL;
 
     /* create the oscilloscope screen */
-    screen = new Screen();
+    screen_m = new Screen();
 
     // mod the front panel depending on the picoscope capabilities
     memset(&device_info, 0, sizeof(Acquisition::device_info_t));
-    acquisition = Acquisition::get_instance();
-    if(NULL == acquisition)
+    acquisition_m = Acquisition::get_instance();
+    if(NULL == acquisition_m)
     {
         ERROR("Acquisition::get_instance returned NULL.\n");
         snprintf(device_info.device_name, DEVICE_NAME_MAX ,"No detected device...!");
@@ -84,8 +84,8 @@ FrontPanel::FrontPanel(QWidget *parent)
     }
     else
     {
-        acquisition->setDrawData(screen);
-        acquisition->get_device_info(&device_info);
+        acquisition_m->setDrawData(screen_m);
+        acquisition_m->get_device_info(&device_info);
     }
     // show the detected device name in status bar for 30 seconds
     ((QMainWindow*)parent)->statusBar()->showMessage(tr(device_info.device_name), 30000);
@@ -94,79 +94,79 @@ FrontPanel::FrontPanel(QWidget *parent)
 
     if(device_info.nb_channels >= 1)
     {
-        volt_channel_A = new ComboRange(tr("VOLT/DIV CH. A"));
-        for(uint32_t i = 0; i < volt_items->size(); i++)
-            volt_channel_A->setValue(i, (volt_items->at(i)).name.c_str());
+        volt_channel_A_m = new ComboRange(tr("VOLT/DIV CH. A"));
+        for(uint32_t i = 0; i < volt_items_m->size(); i++)
+            volt_channel_A_m->setValue(i, (volt_items_m->at(i)).name.c_str());
         // set screen values
-        if(NULL != acquisition && NULL != screen)
+        if(NULL != acquisition_m && NULL != screen_m)
         {
-            screen->setVoltCaliber((volt_items->back()).value);
-            acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->back()).value);
-            volt_channel_A->setCurrentIndex(volt_items->size() - 1);
+            screen_m->setVoltCaliber((volt_items_m->back()).value);
+            acquisition_m->set_voltages(Acquisition::CHANNEL_A, (volt_items_m->back()).value);
+            volt_channel_A_m->setCurrentIndex(volt_items_m->size() - 1);
         }
         // connect volt combo to the font panel
         // front panel will then set screen values
-        connect(volt_channel_A, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
-        leftLayout->addWidget(volt_channel_A);
+        connect(volt_channel_A_m, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelAChanged(int)));
+        leftLayout->addWidget(volt_channel_A_m);
         
     }
 
     if(device_info.nb_channels >= 2)
     {
-        volt_channel_B = new ComboRange(tr("VOLT/DIV CH. B"));
-        for(uint32_t i = 0; i < volt_items->size(); i++)
-            volt_channel_B->setValue(i, (volt_items->at(i)).name.c_str());
+        volt_channel_B_m = new ComboRange(tr("VOLT/DIV CH. B"));
+        for(uint32_t i = 0; i < volt_items_m->size(); i++)
+            volt_channel_B_m->setValue(i, (volt_items_m->at(i)).name.c_str());
         // set screen values
-        if(NULL != acquisition)
+        if(NULL != acquisition_m)
         {
-            acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->back()).value);
-            volt_channel_B->setCurrentIndex(volt_items->size() - 1);
+            acquisition_m->set_voltages(Acquisition::CHANNEL_B, (volt_items_m->back()).value);
+            volt_channel_B_m->setCurrentIndex(volt_items_m->size() - 1);
         }
         // connect volt combo to the font panel
         // front panel will then set screen values
-        connect(volt_channel_B, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
-        leftLayout->addWidget(volt_channel_B);
+        connect(volt_channel_B_m, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
+        leftLayout->addWidget(volt_channel_B_m);
     }
 
-    time = new ComboRange(tr("TIME/DIV"));
-    for(uint32_t i = 0; i < time_items->size(); i++)
-        time->setValue(i, (time_items->at(i)).name.c_str());
+    time_m = new ComboRange(tr("TIME/DIV"));
+    for(uint32_t i = 0; i < time_items_m->size(); i++)
+        time_m->setValue(i, (time_items_m->at(i)).name.c_str());
     // set screen values
-    if(NULL != acquisition && NULL != screen)
+    if(NULL != acquisition_m && NULL != screen_m)
     {
-        acquisition->set_timebase((time_items->at(0)).value);
-        screen->setTimeCaliber((time_items->at(0)).value);
-        time->setCurrentIndex(0);
+        acquisition_m->set_timebase((time_items_m->at(0)).value);
+        screen_m->setTimeCaliber((time_items_m->at(0)).value);
+        time_m->setCurrentIndex(0);
     }
     // connect time combo to the font panel
     // front panel will then set screen values
-    connect(time, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
-    leftLayout->addWidget(time);
+    connect(time_m, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
+    leftLayout->addWidget(time_m);
 
-    current = new ComboRange(tr("CURRENT"));
-    for(uint32_t i = 0; i < current_items->size(); i++)
-        current->setValue(i, (current_items->at(i)).name.c_str());
+    current_m = new ComboRange(tr("CURRENT"));
+    for(uint32_t i = 0; i < current_items_m->size(); i++)
+        current_m->setValue(i, (current_items_m->at(i)).name.c_str());
     // connect current combo to the font panel
     // front panel will then set screen values
-    connect(current, SIGNAL(valueChanged(int)), this, SLOT(setCurrentChanged(int)));
-    leftLayout->addWidget(current);
+    connect(current_m, SIGNAL(valueChanged(int)), this, SLOT(setCurrentChanged(int)));
+    leftLayout->addWidget(current_m);
     // set screen values
     setCurrentChanged(0);
 
-    trigger = new ComboRange(tr("TRIGGER"));
-    for(uint32_t i = 0; i < trigger_items->size(); i++)
-        trigger->setValue(i, (trigger_items->at(i)).name.c_str());
+    trigger_m = new ComboRange(tr("TRIGGER"));
+    for(uint32_t i = 0; i < trigger_items_m->size(); i++)
+        trigger_m->setValue(i, (trigger_items_m->at(i)).name.c_str());
     // connect trigger combo to the font panel
-    connect(trigger, SIGNAL(valueChanged(int)), this, SLOT(setTriggerChanged(int)));
-    leftLayout->addWidget(trigger);
+    connect(trigger_m, SIGNAL(valueChanged(int)), this, SLOT(setTriggerChanged(int)));
+    leftLayout->addWidget(trigger_m);
 
-    trigger_value = new QDoubleSpinBox;
-    trigger_value->setRange(-5.0, 5.0);
-    trigger_value->setSingleStep(0.01);
-    trigger_value->setValue(0.0);
-    trigger_value->hide();
-    connect(trigger_value, SIGNAL(valueChanged(double)), this, SLOT(setTriggerChanged(double)));
-    leftLayout->addWidget(trigger_value);
+    trigger_value_m = new QDoubleSpinBox;
+    trigger_value_m->setRange(-5.0, 5.0);
+    trigger_value_m->setSingleStep(0.01);
+    trigger_value_m->setValue(0.0);
+    trigger_value_m->hide();
+    connect(trigger_value_m, SIGNAL(valueChanged(double)), this, SLOT(setTriggerChanged(double)));
+    leftLayout->addWidget(trigger_value_m);
 
     // set screen values
     setTriggerChanged(0);
@@ -178,7 +178,7 @@ FrontPanel::FrontPanel(QWidget *parent)
     topLayout->addStretch(1);
     //topLayout->addWidget(quit);
 
-    screenLayout->addWidget(screen);
+    screenLayout->addWidget(screen_m);
     screenBox->setLayout(screenLayout);
 
     //gridLayout->addWidget(quit, 0, 0);
@@ -189,43 +189,43 @@ FrontPanel::FrontPanel(QWidget *parent)
     setLayout(gridLayout);
 
     // start acquisition:
-    if(NULL != acquisition)
-        acquisition->start();
+    if(NULL != acquisition_m)
+        acquisition_m->start();
 
 }
 
 FrontPanel::~FrontPanel()
 {
     /* delete ComboRanges */
-    if( NULL != volt_channel_A )
-        delete volt_channel_A;
-    if( NULL != volt_channel_B )
-        delete volt_channel_B;
-    if( NULL != current )
-        delete current;
-    if( NULL != time )
-        delete time;
-    if( NULL != trigger )
-        delete trigger;
+    if( NULL != volt_channel_A_m )
+        delete volt_channel_A_m;
+    if( NULL != volt_channel_B_m )
+        delete volt_channel_B_m;
+    if( NULL != current_m )
+        delete current_m;
+    if( NULL != time_m )
+        delete time_m;
+    if( NULL != trigger_m )
+        delete trigger_m;
 
     /* delete items */
-    if( NULL != volt_items )
-        delete volt_items;
-    if( NULL != current_items )
-        delete current_items;
-    if( NULL != time_items )
-        delete time_items;
-    if( NULL != trigger_items )
-        delete trigger_items;
-    if( NULL != trigger_value )
-        delete trigger_value;
+    if( NULL != volt_items_m )
+        delete volt_items_m;
+    if( NULL != current_items_m )
+        delete current_items_m;
+    if( NULL != time_items_m )
+        delete time_items_m;
+    if( NULL != trigger_items_m )
+        delete trigger_items_m;
+    if( NULL != trigger_value_m )
+        delete trigger_value_m;
 
     /* delete acquisition */
-    if(NULL != acquisition)
+    if(NULL != acquisition_m)
     {
-        acquisition->stop();
-        delete acquisition;
-        acquisition = NULL;
+        acquisition_m->stop();
+        delete acquisition_m;
+        acquisition_m = NULL;
     }
 }
 
@@ -237,165 +237,165 @@ void FrontPanel::create_menu_items()
     trigger_item_t new_trigger_item;
 
     /* create voltage items */
-    volt_items = new std::vector<volt_item_t>();
+    volt_items_m = new std::vector<volt_item_t>();
     new_volt_item.name = "5mV/div";
     new_volt_item.value = 0.005;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "10mV/div";
     new_volt_item.value = 0.01;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "20mV/div";
     new_volt_item.value = 0.02;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "50mV/div";
     new_volt_item.value = 0.05;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "100mV/div";
     new_volt_item.value = 0.1;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "200mV/div";
     new_volt_item.value = 0.2;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "500mV/div";
     new_volt_item.value = 0.5;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "1V/div";
     new_volt_item.value = 1.;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
     new_volt_item.name = "2V/div";
     new_volt_item.value = 2.;
-    volt_items->push_back(new_volt_item);
+    volt_items_m->push_back(new_volt_item);
 
     /* create time items */
-    time_items = new std::vector<time_item_t>();
+    time_items_m = new std::vector<time_item_t>();
 #if 0
     new_time_item.name = "50ns/div";
     new_time_item.value = 0.00000005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "100ns/div";
     new_time_item.value = 0.0000001;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "200ns/div";
     new_time_item.value = 0.0000002;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "500ns/div";
     new_time_item.value = 0.0000005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "1µs/div";
     new_time_item.value = 0.000001;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "2µs/div";
     new_time_item.value = 0.000002;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "5µs/div";
     new_time_item.value = 0.000005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "10µs/div";
     new_time_item.value = 0.00001;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "20µs/div";
     new_time_item.value = 0.00002;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "50µs/div";
     new_time_item.value = 0.00005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "100µs/div";
     new_time_item.value = 0.0001;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "200µs/div";
     new_time_item.value = 0.0002;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "500µs/div";
     new_time_item.value = 0.0005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
 #endif
     new_time_item.name = "1ms/div";
     new_time_item.value = 0.001;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "2ms/div";
     new_time_item.value = 0.002;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "5ms/div";
     new_time_item.value = 0.005;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "10ms/div";
     new_time_item.value = 0.01;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "20ms/div";
     new_time_item.value = 0.02;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "50ms/div";
     new_time_item.value = 0.05;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "100ms/div";
     new_time_item.value = 0.1;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "200ms/div";
     new_time_item.value = 0.2;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "500ms/div";
     new_time_item.value = 0.5;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "1s/div";
     new_time_item.value = 1.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "2s/div";
     new_time_item.value = 2.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "5s/div";
     new_time_item.value = 5.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "10s/div";
     new_time_item.value = 10.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "20s/div";
     new_time_item.value = 20.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "100s/div";
     new_time_item.value = 100.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "200s/div";
     new_time_item.value = 200.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "500s/div";
     new_time_item.value = 500.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
     new_time_item.name = "1000s/div";
     new_time_item.value = 1000.;
-    time_items->push_back(new_time_item);
+    time_items_m->push_back(new_time_item);
 
     /* create current items */
-    current_items = new std::vector<current_item_t>();
+    current_items_m = new std::vector<current_item_t>();
     new_current_item.name = "AC";
     new_current_item.value = E_CURRENT_AC;
-    current_items->push_back(new_current_item);
+    current_items_m->push_back(new_current_item);
     new_current_item.name = "DC";
     new_current_item.value = E_CURRENT_DC;
-    current_items->push_back(new_current_item);
+    current_items_m->push_back(new_current_item);
 
     /* create trigger items */
-    trigger_items = new std::vector<trigger_item_t>();
+    trigger_items_m = new std::vector<trigger_item_t>();
     new_trigger_item.name = "Auto";
     new_trigger_item.value = E_TRIGGER_AUTO;
-    trigger_items->push_back(new_trigger_item);
+    trigger_items_m->push_back(new_trigger_item);
     new_trigger_item.name = "Rising";
     new_trigger_item.value = E_TRIGGER_RISING;
-    trigger_items->push_back(new_trigger_item);
+    trigger_items_m->push_back(new_trigger_item);
     new_trigger_item.name = "Falling";
     new_trigger_item.value = E_TRIGGER_FALLING;
-    trigger_items->push_back(new_trigger_item);
+    trigger_items_m->push_back(new_trigger_item);
 
 }
 
 void FrontPanel::setVoltChannelAChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
-    screen->setVoltCaliber((volt_items->at(comboIndex)).value);
-    if( NULL != acquisition )
+    screen_m->setVoltCaliber((volt_items_m->at(comboIndex)).value);
+    if( NULL != acquisition_m )
     {
-        acquisition->stop();
-        acquisition->set_voltages(Acquisition::CHANNEL_A, (volt_items->at(comboIndex)).value);
-        acquisition->start();
+        acquisition_m->stop();
+        acquisition_m->set_voltages(Acquisition::CHANNEL_A, (volt_items_m->at(comboIndex)).value);
+        acquisition_m->start();
     }
 }
 
@@ -403,71 +403,71 @@ void FrontPanel::setVoltChannelBChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
     // A is the main channel to rescale graphics. So B is not rescaling:
-    //screen->setVoltCaliber((volt_items->at(comboIndex)).value);
-    if( NULL != acquisition )
+    //screen_m->setVoltCaliber((volt_items_m->at(comboIndex)).value);
+    if( NULL != acquisition_m )
     {
-        acquisition->stop();
-        acquisition->set_voltages(Acquisition::CHANNEL_B, (volt_items->at(comboIndex)).value);
-        acquisition->start();
+        acquisition_m->stop();
+        acquisition_m->set_voltages(Acquisition::CHANNEL_B, (volt_items_m->at(comboIndex)).value);
+        acquisition_m->start();
     }
 }
 
 void FrontPanel::setTimeChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
-    screen->setTimeCaliber((time_items->at(comboIndex)).value);
-    if( NULL != acquisition )
+    screen_m->setTimeCaliber((time_items_m->at(comboIndex)).value);
+    if( NULL != acquisition_m )
     {
-        acquisition->stop();
-        acquisition->set_timebase((time_items->at(comboIndex)).value);
-        acquisition->start();
+        acquisition_m->stop();
+        acquisition_m->set_timebase((time_items_m->at(comboIndex)).value);
+        acquisition_m->start();
     }
 }
 
 void FrontPanel::setCurrentChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
-    screen->setCurrent((current_items->at(comboIndex)).value);
+    screen_m->setCurrent((current_items_m->at(comboIndex)).value);
     // TODO set acquisition accordingly
-    if ( NULL != acquisition )
+    if ( NULL != acquisition_m )
     {
-        acquisition->stop();
-        acquisition->set_DC_coupled((current_items->at(comboIndex)).value);
-        acquisition->start();
+        acquisition_m->stop();
+        acquisition_m->set_DC_coupled((current_items_m->at(comboIndex)).value);
+        acquisition_m->start();
     }
 }
 
 void FrontPanel::setTriggerChanged(int comboIndex)
 {
     DEBUG("Combo index %d\n", comboIndex);
-    screen->setTrigger((trigger_items->at(comboIndex)).value);
-    if( NULL == trigger_value )
+    screen_m->setTrigger((trigger_items_m->at(comboIndex)).value);
+    if( NULL == trigger_value_m )
     {
         ERROR("trigger_value is NULL.\n");
         return;
     }
-    if( NULL != acquisition )
+    if( NULL != acquisition_m )
     {
-        acquisition->stop();
-        acquisition->set_trigger((trigger_items->at(comboIndex)).value, trigger_value->value());
+        acquisition_m->stop();
+        acquisition_m->set_trigger((trigger_items_m->at(comboIndex)).value, trigger_value_m->value());
         /* If Auto trigger is set, hide trigger input 
          * and if not set, show trigger input dialog.
          */
-        if(((trigger_items->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value->isHidden() == false))
+        if(((trigger_items_m->at(comboIndex)).value == E_TRIGGER_AUTO) && (trigger_value_m->isHidden() == false))
         {
-            trigger_value->hide();
+            trigger_value_m->hide();
         }
-        else if(((trigger_items->at(comboIndex)).value != E_TRIGGER_AUTO) && (trigger_value->isHidden() == true))
+        else if(((trigger_items_m->at(comboIndex)).value != E_TRIGGER_AUTO) && (trigger_value_m->isHidden() == true))
         {
-            trigger_value->show();
+            trigger_value_m->show();
         }
-        acquisition->start();
+        acquisition_m->start();
     }
 }
 
 void FrontPanel::setTriggerChanged(double trigger_value)
 {
     (void)trigger_value;
-    setTriggerChanged(trigger->value());
+    setTriggerChanged(trigger_m->value());
 }
 
