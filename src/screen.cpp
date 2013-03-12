@@ -117,7 +117,6 @@ void Screen::setVoltCaliber(double voltCaliber)
     //emit voltCaliberChanged(currentVoltCaliber);
     setAxisScale(QwtPlot::yLeft,-(5*currentVoltCaliber),(5*currentVoltCaliber), currentVoltCaliber);
     // update all:
-    //replot();
     update();
 }
 
@@ -130,7 +129,6 @@ void Screen::setTimeCaliber(double timeCaliber)
     currentTimeCaliber = timeCaliber;
     setAxisScale(QwtPlot::xBottom, 0.0, 5*currentTimeCaliber, currentTimeCaliber);
     // update all:
-    //replot();
     update();
     //emit timeCaliberChanged(currentTimeCaliber);
 }

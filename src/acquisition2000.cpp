@@ -389,6 +389,7 @@ void Acquisition2000::collect_block_immediate (void)
                 }
             }
         }
+        Sleep(100);
     }
     for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
     {
@@ -547,6 +548,7 @@ void Acquisition2000::collect_block_triggered (trigger_e trigger_slope, double t
             }
 
         }
+        Sleep(100);
     }
 
     for (ch = 0; ch < unitOpened_m.noOfChannels; ch++)
