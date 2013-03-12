@@ -56,6 +56,7 @@ Acquisition2000::Acquisition2000() :
     if ( unitOpened_m.handle < 1 )
     {
         DEBUG ( "Unable to open device\n" );
+        unitOpened_m.model = MODEL_NONE;
         return;
     }
 

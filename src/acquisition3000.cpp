@@ -59,6 +59,7 @@ Acquisition3000::Acquisition3000() :
     if ( unitOpened_m.handle < 1 )
     {
         DEBUG ( "Unable to open device\n" );
+        unitOpened_m.model = MODEL_NONE;
         return;
     }
 
