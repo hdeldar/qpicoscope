@@ -529,8 +529,7 @@ void Acquisition3000::collect_block_triggered (trigger_e trigger_slope, double t
         /* Get the times (in units specified by time_units)
          *  and the values (in ADC counts)
          */
-        ps3000_get_times_and_values ( unitOpened_m.handle,
-                                  times,
+        ps3000_get_times_and_values ( unitOpened_m.handle, times,
                                   unitOpened_m.channelSettings[PS3000_CHANNEL_A].values,
                                   unitOpened_m.channelSettings[PS3000_CHANNEL_B].values,
                                   unitOpened_m.channelSettings[PS3000_CHANNEL_C].values,
@@ -1509,10 +1508,10 @@ void Acquisition3000::set_timebase (double time_per_division)
            * Screen has 5 time divisions.
            * So we want 500 points
            */
-          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.01)){
+          if(((double)time_interval * adc_multipliers(time_units)) <= (time_per_division * 0.010)){
               timebase = i;
           }
-          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.01)){
+          else if(((double)time_interval * adc_multipliers(time_units)) > (time_per_division * 0.010)){
               break;
           }
       }

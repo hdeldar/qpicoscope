@@ -126,6 +126,9 @@ private:
     QwtPlotCurve curveB;
     QwtPlotCurve curveC;
     QwtPlotCurve curveD;
+
+    bool needToRepait;
+    pthread_mutex_t needToRepaitLock;
     
 };
 

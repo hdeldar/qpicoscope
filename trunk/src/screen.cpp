@@ -90,7 +90,9 @@ Screen::Screen(QWidget *parent)
     curveD.setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
     curveD.attach(this);
 
+    pthread_mutex_init(&needToRepaitLock, NULL);
 
+    replot();
 }
 
 void Screen::initGradient()
@@ -109,6 +111,7 @@ void Screen::initGradient()
 
 void Screen::setVoltCaliber(double voltCaliber)
 {
+    DEBUG("voltCaliber %f\n", voltCaliber);
     if (currentVoltCaliber == voltCaliber)
         return;
     currentVoltCaliber = voltCaliber;
@@ -122,6 +125,7 @@ void Screen::setVoltCaliber(double voltCaliber)
 
 void Screen::setTimeCaliber(double timeCaliber)
 {
+    DEBUG("timeCaliber %f\n", timeCaliber);
     if (timeCaliber < 0)
         timeCaliber = 0;
     if (currentTimeCaliber == timeCaliber)
@@ -193,8 +197,16 @@ void Screen::mouseReleaseEvent(QMouseEvent *event)
 
 void Screen::paintEvent(QPaintEvent *event)
 {
-
-    (void)event;
+    bool needToRepaint_l = false;
+    DEBUG("event %d\n", event->type());
+#if 0
+    QFrame::paintEvent(event);  
+  
+    QPainter painter(this);  
+    painter.setClipRect(canvas()->rect());
+    painter.translate(canvas()->geometry().x(),canvas()->geometry().y());
+    drawCanvas(&painter);
+#endif
 //    QPainter painter(this);
 //    painter.drawText(200, 140,
 //                     tr("Volt/div = ") + QString::number(currentVoltCaliber));
@@ -220,8 +232,15 @@ void Screen::paintEvent(QPaintEvent *event)
 //        paintShot(painter);
 //    if (!gameEnded)
 //        paintTarget(painter);
+    pthread_mutex_lock(&needToRepaitLock);
+    needToRepaint_l = needToRepait;
+    pthread_mutex_unlock(&needToRepaitLock);
     // TODO calling replot here is freezing the mainwindow.... But not calling it will never show the curves...
-    replot();
+    if(needToRepaint_l)
+    {
+        replot();
+    }
+    event->accept();
 }
 
 //void Screen::paintShot(QPainter &painter)
@@ -357,6 +376,9 @@ int8_t Screen::setData(uint8_t channel_id, double *x_data, double *y_data, uint3
         curve->setData( x_data + INT_MAX, y_data + INT_MAX, (int)(nb_points-INT_MAX));
 #endif
     }
+    pthread_mutex_lock(&needToRepaitLock);
+    needToRepait = true;
+    pthread_mutex_unlock(&needToRepaitLock);
     update();
     return 0;
 }

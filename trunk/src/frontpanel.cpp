@@ -97,12 +97,15 @@ FrontPanel::FrontPanel(QWidget *parent)
         volt_channel_A_m = new ComboRange(tr("VOLT/DIV CH. A"));
         for(uint32_t i = 0; i < volt_items_m->size(); i++)
             volt_channel_A_m->setValue(i, (volt_items_m->at(i)).name.c_str());
+        if(NULL != acquisition_m)
+        {
+            acquisition_m->set_voltages(Acquisition::CHANNEL_A, (volt_items_m->back()).value);
+        }
+        volt_channel_A_m->setCurrentIndex(volt_items_m->size() - 1);
         // set screen values
-        if(NULL != acquisition_m && NULL != screen_m)
+        if(NULL != screen_m)
         {
             screen_m->setVoltCaliber((volt_items_m->back()).value);
-            acquisition_m->set_voltages(Acquisition::CHANNEL_A, (volt_items_m->back()).value);
-            volt_channel_A_m->setCurrentIndex(volt_items_m->size() - 1);
         }
         // connect volt combo to the font panel
         // front panel will then set screen values
@@ -120,8 +123,8 @@ FrontPanel::FrontPanel(QWidget *parent)
         if(NULL != acquisition_m)
         {
             acquisition_m->set_voltages(Acquisition::CHANNEL_B, (volt_items_m->back()).value);
-            volt_channel_B_m->setCurrentIndex(volt_items_m->size() - 1);
         }
+        volt_channel_B_m->setCurrentIndex(volt_items_m->size() - 1);
         // connect volt combo to the font panel
         // front panel will then set screen values
         connect(volt_channel_B_m, SIGNAL(valueChanged(int)), this, SLOT(setVoltChannelBChanged(int)));
@@ -132,12 +135,15 @@ FrontPanel::FrontPanel(QWidget *parent)
     for(uint32_t i = 0; i < time_items_m->size(); i++)
         time_m->setValue(i, (time_items_m->at(i)).name.c_str());
     // set screen values
+    if(NULL != screen_m)
+    {
+        screen_m->setTimeCaliber((time_items_m->at(0)).value);
+    }
     if(NULL != acquisition_m && NULL != screen_m)
     {
         acquisition_m->set_timebase((time_items_m->at(0)).value);
-        screen_m->setTimeCaliber((time_items_m->at(0)).value);
-        time_m->setCurrentIndex(0);
     }
+    time_m->setCurrentIndex(0);
     // connect time combo to the font panel
     // front panel will then set screen values
     connect(time_m, SIGNAL(valueChanged(int)), this, SLOT(setTimeChanged(int)));
@@ -176,12 +182,10 @@ FrontPanel::FrontPanel(QWidget *parent)
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
 
     topLayout->addStretch(1);
-    //topLayout->addWidget(quit);
 
     screenLayout->addWidget(screen_m);
     screenBox->setLayout(screenLayout);
 
-    //gridLayout->addWidget(quit, 0, 0);
     gridLayout->addLayout(topLayout, 0, 1);
     gridLayout->addLayout(leftLayout, 1, 0);
     gridLayout->addWidget(screenBox, 1, 1, 2, 1);

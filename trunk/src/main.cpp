@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     QDir::setSearchPaths("icons", icons_pathes);
     MainWindow mainwindow;
     mainwindow.setGeometry(100, 100, 800, 600);
-    mainwindow.show();
     mainwindow.setWindowIcon(QIcon("icons:icon50.png"));
     mainwindow.setWindowTitle(QString("QPicoscope"));
+    mainwindow.show();
     return app.exec();
 }
