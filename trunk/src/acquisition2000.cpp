@@ -92,7 +92,9 @@ Acquisition2000* Acquisition2000::get_instance()
  ****************************************************************************/
 Acquisition2000::~Acquisition2000()
 {
+    DEBUG ( "Device destroyed\n" );
     ps2000_close_unit ( unitOpened_m.handle );
+    Acquisition2000::singleton_m = NULL;
 }
 
 /****************************************************************************
