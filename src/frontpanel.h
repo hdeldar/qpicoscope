@@ -31,6 +31,10 @@
 
 #include <QWidget>
 #include <QDoubleSpinBox>
+#include <QFrame>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <string>
 #include <vector>
 
@@ -64,10 +68,14 @@ protected slots:
 private:
     /** @brief create menu items */
     void create_menu_items();
+    /** @brief thread searching for acquisition device */
+    static void* searchForAcquisitionDeviceThread(void* _frontpanel);
+    pthread_t searchForAcquisitionDeviceThreadId;
     /** @brief screen of the front panel */
     Screen *screen_m;
     /** @brief Acquisition engine of the oscilloscope */
     Acquisition* acquisition_m;
+    pthread_mutex_t acquisitionLock_m;
     /** @brief voltage selection on the front panel */
     ComboRange *volt_channel_A_m;
     ComboRange *volt_channel_B_m;
@@ -102,6 +110,8 @@ private:
     }trigger_item_t;
     std::vector<trigger_item_t> *trigger_items_m;
     QDoubleSpinBox *trigger_value_m;
+    /* Store the parent class */
+    QWidget *parent_m;
 
 };
 

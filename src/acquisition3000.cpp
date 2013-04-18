@@ -95,7 +95,9 @@ Acquisition3000* Acquisition3000::get_instance()
  ****************************************************************************/
 Acquisition3000::~Acquisition3000()
 {
-    ps3000_close_unit ( unitOpened_m.handle );
+    DEBUG ( "Device destroyed\n" );
+    ps3000_close_unit ( unitOpened_m.handle ); 
+    Acquisition3000::singleton_m = NULL;
 }
 
 /****************************************************************************
