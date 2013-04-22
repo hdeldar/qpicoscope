@@ -7,7 +7,8 @@ HEADERS        = screen.h \
                  acquisition.h \
                  acquisition2000.h \
                  acquisition3000.h \
-                 mainwindow.h
+                 mainwindow.h \
+                 search-for-acquisition-device-worker.h
 SOURCES        = screen.cpp \
                  frontpanel.cpp \
                  main.cpp \
@@ -15,7 +16,8 @@ SOURCES        = screen.cpp \
                  acquisition.cpp \
                  acquisition2000.cpp \
                  acquisition3000.cpp \
-                 mainwindow.cpp
+                 mainwindow.cpp \
+                 search-for-acquisition-device-worker.cpp
 TARGET        = QPicoscope
 QTDIR_build:REQUIRES="contains(QT_CONFIG, full-config)"
 unix:LIBS += -lm -lps2000 -lps3000
