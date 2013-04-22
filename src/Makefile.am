@@ -10,6 +10,7 @@ QPicoscope_SOURCES = 	acquisition2000.cpp  \
 			main.cpp  \
 			mainwindow.cpp  \
 			screen.cpp \
+			search-for-acquisition-device-worker.cpp \
 			comborange.h  \
 			comborange.moc.cpp \
 			acquisition.h  \
@@ -23,7 +24,9 @@ QPicoscope_SOURCES = 	acquisition2000.cpp  \
 			oscilloscope.h \
 			oscilloscope.moc.cpp \
 			screen.h \
-			screen.moc.cpp
+			screen.moc.cpp \
+			search-for-acquisition-device-worker.h \
+			search-for-acquisition-device-worker.moc.cpp
 
 QPicoscope_CXXFLAGS = $(QT_CXXFLAGS) $(AM_CXXFLAGS) -g -Wall
 QPicoscope_CPPFLAGS = $(QT_CPPFLAGS) $(AM_CPPFLAGS) $(CFLAGS_QWT)

@@ -34,12 +34,14 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QThread>
 #include <QVBoxLayout>
 #include <string>
 #include <vector>
 
 #include "oscilloscope.h"
 #include "acquisition.h"
+#include "search-for-acquisition-device-worker.h"
 
 class ComboRange;
 class Screen;
@@ -47,6 +49,8 @@ class Screen;
 class FrontPanel : public QWidget
 {
     Q_OBJECT
+
+    friend class SearchForAcquisitionDeviceWorker;
 
 public:
     /**
@@ -64,13 +68,15 @@ protected slots:
     void setCurrentChanged(int);
     void setTriggerChanged(int);
     void setTriggerChanged(double);
+    void setStatusBarMessage(QString);
 
 private:
     /** @brief create menu items */
     void create_menu_items();
-    /** @brief thread searching for acquisition device */
-    static void* searchForAcquisitionDeviceThread(void* _frontpanel);
-    pthread_t searchForAcquisitionDeviceThreadId;
+    /** @brief acquisition device search thread */
+    QThread* searchForAcquisitionDeviceThread;
+    /** @brief acquisition device search class */
+    SearchForAcquisitionDeviceWorker* searchForAcquisitionDeviceWorker;
     /** @brief screen of the front panel */
     Screen *screen_m;
     /** @brief Acquisition engine of the oscilloscope */

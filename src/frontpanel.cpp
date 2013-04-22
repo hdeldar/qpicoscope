@@ -172,10 +172,22 @@ FrontPanel::FrontPanel(QWidget *parent)
 
     // initialize acquisition
     pthread_mutex_init(&acquisitionLock_m, NULL);
-    pthread_create(&searchForAcquisitionDeviceThreadId,
-                   NULL,
-                   FrontPanel::searchForAcquisitionDeviceThread,
-                   (void*)this);
+    QThread* searchForAcquisitionDeviceThread = new QThread(this);;
+    SearchForAcquisitionDeviceWorker* searchForAcquisitionDeviceWorker = new SearchForAcquisitionDeviceWorker(this);    
+    connect(searchForAcquisitionDeviceThread, 
+            SIGNAL(started()), 
+            searchForAcquisitionDeviceWorker, 
+            SLOT(searchForAcquisitionDevice()));
+    connect(searchForAcquisitionDeviceThread, 
+            SIGNAL(finished()), 
+            searchForAcquisitionDeviceWorker, 
+            SLOT(stopSearchForAcquisitionDevice()));
+    connect(searchForAcquisitionDeviceWorker,
+            SIGNAL(newStatusBarMessage(QString)), 
+            this,
+            SLOT(setStatusBarMessage(QString)));
+    searchForAcquisitionDeviceWorker->moveToThread(searchForAcquisitionDeviceThread);
+    searchForAcquisitionDeviceThread->start();
 }
 
 FrontPanel::~FrontPanel()
@@ -455,60 +467,7 @@ void FrontPanel::setTriggerChanged(double trigger_value)
     setTriggerChanged(trigger_m->value());
 }
 
-void* FrontPanel::searchForAcquisitionDeviceThread(void* _frontpanel)
+void FrontPanel::setStatusBarMessage(QString text)
 {
-    FrontPanel* parent = (FrontPanel*)_frontpanel;
-    Acquisition* device = NULL;
-    Acquisition::device_info_t device_info;
-    bool running = true;
-    // mod the front panel depending on the picoscope capabilities
-    memset(&device_info, 0, sizeof(Acquisition::device_info_t));
-    do
-    {
-        device = Acquisition::get_instance();
-        if(NULL == device)
-        {
-            ERROR("Acquisition::get_instance returned NULL.\n");
-            snprintf(device_info.device_name, DEVICE_NAME_MAX ,"No detected device...!");
-            ((QMainWindow*)(parent->parent_m))->statusBar()->showMessage(tr(device_info.device_name), 1000);
-            sleep(1);
-        }
-    }while((NULL == device) && running);
-
-    pthread_mutex_lock(&parent->acquisitionLock_m);
-    parent->acquisition_m = device;
-    parent->acquisition_m->setDrawData(parent->screen_m);
-    parent->acquisition_m->get_device_info(&device_info);
-    // show the detected device name in status bar for 30 seconds
-    ((QMainWindow*)(parent->parent_m))->statusBar()->showMessage(tr(device_info.device_name), 30000);
-    if(device_info.nb_channels >= 1)
-    {
-
-        parent->acquisition_m->set_voltages(Acquisition::CHANNEL_A, (parent->volt_items_m->back()).value);
-        parent->volt_channel_A_m->setCurrentIndex(parent->volt_items_m->size() - 1);
-        // set screen values
-        parent->screen_m->setVoltCaliber((parent->volt_items_m->back()).value);
-        
-    }
-    else
-    {
-        // stupid if a device has no channel...
-        ERROR("This device has no channel\n");
-        parent->volt_channel_A_m->setVisible(false);
-    }
-
-    if(device_info.nb_channels >= 2)
-    {
-        parent->acquisition_m->set_voltages(Acquisition::CHANNEL_B, (parent->volt_items_m->back()).value);
-        parent->volt_channel_B_m->setCurrentIndex(parent->volt_items_m->size() - 1);
-    }
-    else
-    {
-        parent->volt_channel_B_m->setVisible(false);
-    }
-    parent->acquisition_m->set_timebase((parent->time_items_m->at(0)).value);
-    parent->acquisition_m->start();
-    pthread_mutex_unlock(&parent->acquisitionLock_m);
-    pthread_exit(0);
-    return NULL;
+  ((QMainWindow*)(parent_m))->statusBar()->showMessage(text, 30000);
 }
