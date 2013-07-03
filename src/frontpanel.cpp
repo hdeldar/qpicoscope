@@ -56,6 +56,10 @@ FrontPanel::FrontPanel(QWidget *parent)
     QVBoxLayout *screenLayout = new QVBoxLayout;
     QGridLayout *gridLayout = new QGridLayout;
 
+    /* initialize acquisition */
+    acquisition_m = NULL;
+    pthread_mutex_init(&acquisitionLock_m, NULL);
+    
     /* initialize ComboRanges */
     volt_channel_A_m = NULL;
     volt_channel_B_m = NULL;
@@ -170,8 +174,7 @@ FrontPanel::FrontPanel(QWidget *parent)
     setLayout(gridLayout);
 
 
-    // initialize acquisition
-    pthread_mutex_init(&acquisitionLock_m, NULL);
+    /* initialize acquisition search */
     QThread* searchForAcquisitionDeviceThread = new QThread(this);;
     SearchForAcquisitionDeviceWorker* searchForAcquisitionDeviceWorker = new SearchForAcquisitionDeviceWorker(this);    
     connect(searchForAcquisitionDeviceThread, 
