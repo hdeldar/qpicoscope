@@ -36,6 +36,12 @@ Once Picotech library is install you can compile QPicoscope using:
 - Autotools (see §III.1)
 - qmake (see §III.2)
 
+In both cases you will need the following packages to be installed on your machine (these are the names for Ubuntu 12.04 and might be different depending on your distribution):
+- make
+- qt4-qmake
+- libqt4-dev
+- libqwt5-qt4-dev
+
 III.1 - INSTALLATION USING AUTOTOOLS
 
 run the following commands:
