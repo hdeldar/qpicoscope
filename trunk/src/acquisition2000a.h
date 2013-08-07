@@ -45,7 +45,7 @@
 #include <conio.h>
 
 /* Definitions of PS2000 driver routines on Windows*/
-#include "PS2000.h"
+#include "ps2000aApi.h"
 
 #else
 /* Headers for Linux */
@@ -119,31 +119,30 @@ private:
      */
     typedef enum {
         MODEL_NONE = 0,
-        MODEL_PS2104 = 2104,
-        MODEL_PS2105 = 2105,
-        MODEL_PS2202 = 2202,
-        MODEL_PS2203 = 2203,
-        MODEL_PS2204 = 2204,
-        MODEL_PS2205 = 2205
+        MODEL_PS2205MSO = 2205,
+        MODEL_PS2206	 = 2206,
+        MODEL_PS2207	 = 2207,
+        MODEL_PS2208	 = 2208
     } MODEL_TYPE;
 
     typedef struct
     {
-        PS2000_THRESHOLD_DIRECTION    channelA;
-        PS2000_THRESHOLD_DIRECTION    channelB;
-        PS2000_THRESHOLD_DIRECTION    channelC;
-        PS2000_THRESHOLD_DIRECTION    channelD;
-        PS2000_THRESHOLD_DIRECTION    ext;
+        PS2000A_THRESHOLD_DIRECTION    channelA;
+        PS2000A_THRESHOLD_DIRECTION    channelB;
+        PS2000A_THRESHOLD_DIRECTION    channelC;
+        PS2000A_THRESHOLD_DIRECTION    channelD;
+        PS2000A_THRESHOLD_DIRECTION    ext;
+        PS2000A_THRESHOLD_DIRECTION    aux;
     } DIRECTIONS;
 
     typedef struct
     {
-        PS2000_PWQ_CONDITIONS                    *    conditions;
+        PS2000A_PWQ_CONDITIONS                    *    conditions;
         short                                                        nConditions;
         PS2000_THRESHOLD_DIRECTION          direction;
         unsigned long                                        lower;
         unsigned long                                        upper;
-        PS2000_PULSE_WIDTH_TYPE                    type;
+        PS2000A_PULSE_WIDTH_TYPE                    type;
     } PULSE_WIDTH_QUALIFIER;
 
 
