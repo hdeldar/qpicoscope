@@ -1,0 +1,67 @@
+****************************************************************************
+*                  PicoScope 2000a Linux Driver                            *
+*                          Pico Technology                                 *
+****************************************************************************
+
+Installation instructions for the Pico Technology PicoScope 3000a Linux Driver
+----------------------------------------------------------------------------------
+
+Prerequisites:
+1. You should be using Ubuntu 11.10. The driver is supplied as an deb package 
+   built using Ubuntu 11.10, and has not been tested using any other Linux distribution.
+   Pico cannot provide support on using this driver with any other setup.
+
+
+2. Your system must be set up in such a way that all users who need to use
+   the driver have write access to the USB device. The details of this may be 
+   system-specific - some possible scenarios are covered below. If you are 
+   using Fedora 8, please follow the first case:
+
+	- On systems running udev (such as Ubuntu 11.10), you should create a 
+	  custom rules file which sets the permissions on the relevant devices 
+	  and copy it to /etc/udev/rules.d/ . There is an example rules file 
+	  which includes detailed instructions on how to set this up in 
+	  95-pico.rules.
+
+	- Some other systems may be preconfigured with a group "pico" to which 
+	  automatically-created USB device nodes belong. In this case, all 
+	  you need do is add the relevant users to the "pico" group.
+
+	- It may be possible to use the driver with non-udev based
+	  systems (for example, older Linux systems) but we have not tested
+	  this and cannot provide any support if you attempt to do so.
+
+
+3. In order to use the example programs, your system will need to be set up to 
+   allow you to build C programs. Specifically you will need relevant 
+   toolchains and standard libraries. You will also need the tar and gzip programs 
+   to extract the source code. All these programs form part of any Linux 
+   distribution, but they may not always be installed by default. On Ubuntu, you 
+   can install them using Ubuntu Software Manager under X Windows, or in a terminal 
+   using package management tools such as yum and rpm. For details on how to use these
+   tools, please refer to the official Ubuntu website.
+
+   You can check whether these standard libraries have been installed using Ubuntu
+	 Software Manager or dpkg.
+
+
+Installation:
+1. Get the deb package for the driver from the Pico Technology website:
+		labs.picotech.com
+
+
+2. Go to the directory where you stored the package and install the software
+   as root:
+		sudo dpkg -i ps2000alinux1_1.0-1_i386.deb
+
+
+3. When the driver is installed for the first time, you will see the library and 
+   header files are installed by default under /usr/local. You should ensure 
+   that /usr/local/lib appears in /etc/ld.so.conf or copy 'PicoScope.conf' to 
+   /etc/ld.so.conf.d/ and then run:
+        ldconfig
+     to add the new library to the system cache.
+
+
+4. You are now ready to start using the library in your programs (or why not
+   start by taking a look at our example program?).
