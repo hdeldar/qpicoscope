@@ -35,8 +35,6 @@ fi
 #AC_CHECK_LIB([qwt-qt4], [_init],,AC_MSG_ERROR([This package needs libqwt-qt4]))
 #AC_CHECK_LIB([pthread], [pthread_create],,AC_MSG_ERROR([This package needs POSIX libpthread.]))
 
-# AutoTroll with Qt.
-AT_WITH_QT
 
 qt_ok=yes
 AC_PATH_PROGS([QMAKE], 
@@ -58,6 +56,9 @@ AC_PATH_PROGS([QMAKE],
     if test "x$qt_ok" = "xno"; then
         AC_MSG_ERROR([QT or QWT could not be found. See previous errors.])
     fi
+
+# AutoTroll with Qt.
+AT_WITH_QT
 
 # Output files
 AC_CONFIG_HEADERS(qpicoscope-config.h)
