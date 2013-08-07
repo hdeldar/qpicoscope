@@ -137,18 +137,18 @@ private:
 
     typedef struct
     {
-        PS2000A_PWQ_CONDITIONS                    *    conditions;
-        short                                                        nConditions;
-        PS2000_THRESHOLD_DIRECTION          direction;
-        unsigned long                                        lower;
-        unsigned long                                        upper;
-        PS2000A_PULSE_WIDTH_TYPE                    type;
+        PS2000A_PWQ_CONDITIONS*     conditions;
+        short                       nConditions;
+        PS2000A_THRESHOLD_DIRECTION direction;
+        unsigned long               lower;
+        unsigned long               upper;
+        PS2000A_PULSE_WIDTH_TYPE    type;
     } PULSE_WIDTH_QUALIFIER;
 
 
     typedef struct
     {
-        PS2000_CHANNEL channel;
+        PS2000A_CHANNEL channel;
         float threshold;
         short direction;
         float delay;
@@ -185,13 +185,13 @@ private:
     typedef struct  {
         short handle;
         MODEL_TYPE model;
-        PS2000_RANGE firstRange;
-        PS2000_RANGE lastRange;
+        PS2000A_RANGE firstRange;
+        PS2000A_RANGE lastRange;
         TRIGGER_CHANNEL trigger;
         short maxTimebase;
         short timebases;
         short noOfChannels;
-        CHANNEL_SETTINGS channelSettings[PS2000_MAX_CHANNELS];
+        CHANNEL_SETTINGS channelSettings[PS2000A_MAX_CHANNELS];
         short                hasAdvancedTriggering;
         short                hasFastStreaming;
         short                hasEts;
@@ -200,7 +200,7 @@ private:
     /**
      * @brief private methods declarations
      */
-    Acquisition2000();
+    Acquisition2000a();
     int adc_to_mv (long raw, int ch);    
     short mv_to_adc (short mv, short ch);
     void get_info (void);
@@ -223,12 +223,12 @@ private:
      * @brief private instances declarations
      */
     UNIT_MODEL unitOpened_m;
-    static Acquisition2000 *singleton_m;
+    static Acquisition2000a *singleton_m;
     int scale_to_mv;
     short timebase;
     double time_per_division_m;
     long times[BUFFER_SIZE];
-    static const short input_ranges [PS2000_MAX_RANGES] /*= {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000}*/;
+    static const short input_ranges [PS2000A_MAX_RANGES] /*= {10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000}*/;
 };
 
 #endif // HAVE_LIBPS2000A

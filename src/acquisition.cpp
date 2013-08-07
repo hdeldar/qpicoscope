@@ -82,6 +82,21 @@ Acquisition* Acquisition::get_instance()
                 break;
             }
 #endif
+#ifdef HAVE_LIBPS2000A
+            Acquisition::singleton_m = Acquisition2000a::get_instance();
+            memset(&info, 0, sizeof(device_info_t));
+            Acquisition::singleton_m->get_device_info(&info);
+            if(0 == strncmp( info.device_name, "No device or device not supported", DEVICE_NAME_MAX))
+            {
+                DEBUG("No Picoscope 2000a series found.\n");
+                delete((Acquisition2000a*)Acquisition::singleton_m);
+                Acquisition::singleton_m = NULL;
+            }
+            else
+            {
+                break;
+            }
+#endif
 #ifdef HAVE_LIBPS3000
             Acquisition::singleton_m = Acquisition3000::get_instance();
             memset(&info, 0, sizeof(device_info_t));

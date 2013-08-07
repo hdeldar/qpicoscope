@@ -6,6 +6,7 @@ HEADERS        = screen.h \
                  oscilloscope.h \
                  acquisition.h \
                  acquisition2000.h \
+                 acquisition2000a.h \
                  acquisition3000.h \
                  mainwindow.h \
                  search-for-acquisition-device-worker.h
@@ -15,6 +16,7 @@ SOURCES        = screen.cpp \
                  comborange.cpp \
                  acquisition.cpp \
                  acquisition2000.cpp \
+                 acquisition2000a.cpp \
                  acquisition3000.cpp \
                  mainwindow.cpp \
                  search-for-acquisition-device-worker.cpp
