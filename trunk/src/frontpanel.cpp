@@ -175,7 +175,7 @@ FrontPanel::FrontPanel(QWidget *parent)
 
 
     /* initialize acquisition search */
-    QThread* searchForAcquisitionDeviceThread = new QThread(this);;
+    QThread* searchForAcquisitionDeviceThread = new QThread(this);
     SearchForAcquisitionDeviceWorker* searchForAcquisitionDeviceWorker = new SearchForAcquisitionDeviceWorker(this);    
     connect(searchForAcquisitionDeviceThread, 
             SIGNAL(started()), 
