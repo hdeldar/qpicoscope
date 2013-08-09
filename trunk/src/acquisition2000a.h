@@ -87,32 +87,32 @@ public:
      * @param[in] : the channel index (0 for channel A, 1 for channel B, etc)
      * @param[in] : volts per division caliber
      */
-    void set_voltages (channel_e channel_index, double volts_per_division);
+    void set_voltages (channel_e channel_index, double volts_per_division); // OK
     /**
      * @brief set input time base
      * @param[in] : time per division valiber
      */
-    void set_timebase (double time_per_division);
+    void set_timebase (double time_per_division); // OK
     /**
      * @brief set AC/DC
      * @param[in] : a current_e value (0 = AC, 1 = DC)
      */
-    void set_DC_coupled(current_e coupling);
+    void set_DC_coupled(current_e coupling); // OK
     /**
      * @brief set signal generator (2200 series only) 
      * @param[in] : waveform type 
      * @param[in] : frequency in Hertz
      */
-    void set_sig_gen (e_wave_type waveform, long frequency);
+    void set_sig_gen (e_wave_type waveform, long frequency); // OK
     /**
      * @brief set signal generator arbitrary (2200 series only) 
      * @param[in] : frequency in Hertz
      */
-    void set_sig_gen_arb (long int frequency);
+    void set_sig_gen_arb (long int frequency); // OK
     /**
      * @brief get device informations 
      */
-    void get_device_info(device_info_t* info);
+    void get_device_info(device_info_t* info); // OK
 private:
     /**
      * @brief private typedef declarations
@@ -191,6 +191,7 @@ private:
         short maxTimebase;
         short timebases;
         short noOfChannels;
+	    short maxValue;
         CHANNEL_SETTINGS channelSettings[PS2000A_MAX_CHANNELS];
         short                hasAdvancedTriggering;
         short                hasFastStreaming;
@@ -200,14 +201,25 @@ private:
     /**
      * @brief private methods declarations
      */
-    Acquisition2000a();
-    int adc_to_mv (long raw, int ch);    
-    short mv_to_adc (short mv, short ch);
+    Acquisition2000a();                   // OK
+    int adc_to_mv (long raw, int ch);     // OK
+    short mv_to_adc (short mv, short ch); // OK
     void get_info (void);
-    void set_defaults (void);
+    void set_defaults (void); // OK
+    PICO_STATUS set_trigger(PS2000A_TRIGGER_CHANNEL_PROPERTIES * channelProperties,
+                            short nChannelProperties,
+                            PS2000A_TRIGGER_CONDITIONS * triggerConditions,
+                            short nTriggerConditions,
+                            TRIGGER_DIRECTIONS * directions,
+                            PWQ * pwq,
+                            unsigned long delay,
+                            short auxOutputEnabled,
+                            long autoTriggerMs,
+                            PS2000A_DIGITAL_CHANNEL_DIRECTIONS * digitalDirections,
+                            short nDigitalDirections);
     void set_trigger_advanced(void);
     void collect_block_immediate (void);
-    void collect_block_triggered (trigger_e trigger_slope, double trigger_level);
+    void collect_block_triggered (trigger_e trigger_slope, double trigger_level);    // OK
     void collect_block_advanced_triggered ();
     void collect_block_ets (void);
     void collect_streaming (void);
@@ -224,7 +236,6 @@ private:
      */
     UNIT_MODEL unitOpened_m;
     static Acquisition2000a *singleton_m;
-    int scale_to_mv;
     short timebase;
     double time_per_division_m;
     long times[BUFFER_SIZE];
